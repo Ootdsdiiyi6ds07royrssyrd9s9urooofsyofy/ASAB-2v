@@ -1,0 +1,6 @@
+{
+  "name": "ASAB | AEROLAB 3D - Airborne Command & Simulation",
+  "description": "Advanced Sovereign Airborne Command & Control (ASAB | عَصَب) with AEROLAB 3D engineering digital twin, flight dynamics, and decentralized airborne mesh simulation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

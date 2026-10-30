@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-main: #080D16;
+    --bg-secondary: #0D1623;
+    --bg-panel: #111E2D;
+    --bg-elevated: #172638;
+    --primary-cyan: #35D5E8;
+    --tech-blue: #5587FF;
+    --success-green: #3DDC97;
+    --warning-amber: #F5B82E;
+    --critical-red: #FF5964;
+    --text-primary: #EDF4FA;
+    --text-secondary: #92A4B8;
+    --text-muted: #64768B;
+  }
+
+  body {
+    background-color: #080D16;
+    color: #EDF4FA;
+    font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+    overflow-x: hidden;
+  }
+
+  [dir="rtl"] {
+    font-family: 'IBM Plex Sans Arabic', system-ui, -apple-system, sans-serif;
+  }
+}
+
+/* Custom aerospace scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #080D16;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e3046;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #35D5E8;
+}
+
+.font-tech {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.font-arabic {
+  font-family: 'IBM Plex Sans Arabic', sans-serif;
+}
