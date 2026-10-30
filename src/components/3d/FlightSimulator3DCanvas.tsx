@@ -253,29 +253,118 @@ export const FlightSimulator3DCanvas: React.FC<FlightSimProps> = ({
     });
     scene.add(waypointGroup);
 
-    // Aircraft in flight
+    // High-Fidelity Aerospace VTOL Aircraft in flight
     const aircraftGroup = new THREE.Group();
-    const bodyGeo = new THREE.CylinderGeometry(0.6, 0.4, 4.2, 16);
+
+    const bodyMat = new THREE.MeshStandardMaterial({
+      color: 0x141d28,
+      roughness: 0.35,
+      metalness: 0.75,
+    });
+    const accentMat = new THREE.MeshStandardMaterial({
+      color: 0x243447,
+      roughness: 0.25,
+      metalness: 0.85,
+    });
+    const canopyMat = new THREE.MeshStandardMaterial({
+      color: 0x05121e,
+      roughness: 0.08,
+      metalness: 0.95,
+    });
+    const titaniumMat = new THREE.MeshStandardMaterial({
+      color: 0x8fa2b5,
+      roughness: 0.2,
+      metalness: 0.95,
+    });
+
+    // 1. Aerodynamic chined fuselage
+    const bodyGeo = new THREE.CylinderGeometry(0.55, 0.38, 4.2, 16);
     bodyGeo.rotateX(Math.PI / 2);
-    const bodyMat = new THREE.MeshStandardMaterial({ color: 0x1f2e42, roughness: 0.3, metalness: 0.7 });
+    bodyGeo.scale(1.25, 0.75, 1.0);
     const body = new THREE.Mesh(bodyGeo, bodyMat);
     aircraftGroup.add(body);
 
-    const wingGeo = new THREE.BoxGeometry(6.8, 0.1, 1.2);
-    const wingMat = new THREE.MeshStandardMaterial({ color: 0x172638, roughness: 0.3, metalness: 0.8 });
-    const wings = new THREE.Mesh(wingGeo, wingMat);
-    wings.position.set(0, 0.1, 0.2);
+    // 2. Cockpit canopy
+    const canopyGeo = new THREE.SphereGeometry(0.48, 16, 12, 0, Math.PI * 2, 0, Math.PI * 0.5);
+    canopyGeo.scale(0.85, 0.55, 1.8);
+    canopyGeo.translate(0, 0.28, 0.65);
+    const canopy = new THREE.Mesh(canopyGeo, canopyMat);
+    aircraftGroup.add(canopy);
+
+    // 3. Swept main wings with winglets
+    const wingGeo = new THREE.BoxGeometry(7.2, 0.08, 1.1);
+    wingGeo.translate(0, 0.12, 0.15);
+    const wings = new THREE.Mesh(wingGeo, bodyMat);
     aircraftGroup.add(wings);
 
-    // VTOL Rotors
-    const rotors: THREE.Mesh[] = [];
-    for (const [x, z] of [[-1.8, 1.2], [1.8, 1.2], [-1.8, -1.2], [1.8, -1.2]]) {
-      const rGeo = new THREE.BoxGeometry(1.6, 0.02, 0.12);
-      const rMat = new THREE.MeshBasicMaterial({ color: 0x35d5e8 });
-      const rMesh = new THREE.Mesh(rGeo, rMat);
-      rMesh.position.set(x, 0.35, z);
-      aircraftGroup.add(rMesh);
-      rotors.push(rMesh);
+    // Port & Starboard winglets with nav lights
+    for (const side of [-3.6, 3.6]) {
+      const wletGeo = new THREE.BoxGeometry(0.08, 0.65, 0.45);
+      wletGeo.translate(side, 0.4, 0.2);
+      const wlet = new THREE.Mesh(wletGeo, accentMat);
+      aircraftGroup.add(wlet);
+
+      const navGeo = new THREE.SphereGeometry(0.08, 8, 8);
+      const navMat = new THREE.MeshBasicMaterial({ color: side < 0 ? 0xff2244 : 0x22ff66 });
+      const nav = new THREE.Mesh(navGeo, navMat);
+      nav.position.set(side, 0.65, 0.25);
+      aircraftGroup.add(nav);
+    }
+
+    // 4. Twin tail booms & canted fins
+    for (const side of [-1.8, 1.8]) {
+      const boomGeo = new THREE.CylinderGeometry(0.08, 0.06, 3.4, 12);
+      boomGeo.rotateX(Math.PI / 2);
+      const boom = new THREE.Mesh(boomGeo, accentMat);
+      boom.position.set(side, 0.1, -0.6);
+      aircraftGroup.add(boom);
+
+      const finGeo = new THREE.BoxGeometry(0.05, 0.85, 0.5);
+      const fin = new THREE.Mesh(finGeo, bodyMat);
+      fin.position.set(side, 0.48, -2.1);
+      fin.rotation.z = (side > 0 ? 1 : -1) * 0.2;
+      aircraftGroup.add(fin);
+    }
+
+    // 5. Inverted-V Horizontal Stabilizer
+    const horizGeo = new THREE.BoxGeometry(3.6, 0.06, 0.55);
+    horizGeo.translate(0, 0.55, -2.1);
+    const horiz = new THREE.Mesh(horizGeo, bodyMat);
+    aircraftGroup.add(horiz);
+
+    // 6. Thermal Jet Exhaust Ring
+    const exhaustGeo = new THREE.CylinderGeometry(0.18, 0.22, 0.4, 16);
+    exhaustGeo.rotateX(Math.PI / 2);
+    const exhaustMat = new THREE.MeshStandardMaterial({
+      color: 0x221122,
+      emissive: 0xff5522,
+      emissiveIntensity: 0.6,
+      roughness: 0.3,
+      metalness: 0.8,
+    });
+    const exhaust = new THREE.Mesh(exhaustGeo, exhaustMat);
+    exhaust.position.set(0, 0.05, -2.2);
+    aircraftGroup.add(exhaust);
+
+    // VTOL Rotors with Carbon Blades
+    const rotors: THREE.Group[] = [];
+    for (const [x, z] of [[-1.8, 0.9], [1.8, 0.9], [-1.8, -0.9], [1.8, -0.9]]) {
+      const rGroup = new THREE.Group();
+      rGroup.position.set(x, 0.42, z);
+
+      // Hub
+      const hubGeo = new THREE.CylinderGeometry(0.09, 0.09, 0.12, 12);
+      const hub = new THREE.Mesh(hubGeo, titaniumMat);
+      rGroup.add(hub);
+
+      // 2 Blades
+      const bladeGeo = new THREE.BoxGeometry(1.6, 0.02, 0.12);
+      const bladeMat = new THREE.MeshStandardMaterial({ color: 0x0a1016, roughness: 0.3, metalness: 0.6 });
+      const blades = new THREE.Mesh(bladeGeo, bladeMat);
+      rGroup.add(blades);
+
+      aircraftGroup.add(rGroup);
+      rotors.push(rGroup);
     }
 
     scene.add(aircraftGroup);

@@ -269,30 +269,99 @@ export const Airspace3DCanvas: React.FC<Airspace3DProps> = ({ viewMode = '3d' })
         const group = new THREE.Group();
         group.userData = { nodeId: node.id };
 
-        // Aerodynamic arrow/delta mini aircraft body
-        const shape = new THREE.ConeGeometry(0.5, 1.4, 4);
-        shape.rotateX(Math.PI / 2);
-        const mat = new THREE.MeshStandardMaterial({
-          color: node.role === 'Command Node' ? 0x35d5e8 : node.role === 'Relay Node' ? 0x5587ff : 0x3ddc97,
-          roughness: 0.3,
-          metalness: 0.7,
+        // Build realistic composite mini VTOL airframe
+        const roleColor = node.role === 'Command Node' ? 0x35d5e8 : node.role === 'Relay Node' ? 0x5587ff : 0x3ddc97;
+        const bodyMat = new THREE.MeshStandardMaterial({
+          color: 0x121a24,
+          roughness: 0.35,
+          metalness: 0.8,
         });
-        const mesh = new THREE.Mesh(shape, mat);
-        group.add(mesh);
+        const trimMat = new THREE.MeshStandardMaterial({
+          color: roleColor,
+          roughness: 0.25,
+          metalness: 0.9,
+          emissive: roleColor,
+          emissiveIntensity: 0.3,
+        });
+        const canopyMat = new THREE.MeshStandardMaterial({
+          color: 0x05101a,
+          roughness: 0.1,
+          metalness: 0.95,
+        });
 
-        // Wings
-        const wingG = new THREE.BoxGeometry(2.4, 0.04, 0.4);
-        const wingM = new THREE.Mesh(wingG, mat);
-        group.add(wingM);
+        // 1. Aerodynamic fuselage
+        const bodyGeo = new THREE.CylinderGeometry(0.22, 0.14, 1.8, 12);
+        bodyGeo.rotateX(Math.PI / 2);
+        bodyGeo.scale(1.2, 0.7, 1.0);
+        const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
+        group.add(bodyMesh);
+
+        // 2. Cockpit canopy
+        const canopyGeo = new THREE.SphereGeometry(0.18, 12, 8, 0, Math.PI * 2, 0, Math.PI * 0.5);
+        canopyGeo.scale(0.8, 0.5, 1.2);
+        canopyGeo.translate(0, 0.12, 0.25);
+        const canopyMesh = new THREE.Mesh(canopyGeo, canopyMat);
+        group.add(canopyMesh);
+
+        // 3. Swept main wings with camber
+        const wingGeo = new THREE.BoxGeometry(2.8, 0.035, 0.45);
+        wingGeo.translate(0, 0.05, 0);
+        const wingMesh = new THREE.Mesh(wingGeo, bodyMat);
+        group.add(wingMesh);
+
+        // 4. Winglets & Port/Stbd Nav Strobes
+        const portNavGeo = new THREE.SphereGeometry(0.04, 8, 8);
+        const portNavMat = new THREE.MeshBasicMaterial({ color: 0xff2244 });
+        const portNav = new THREE.Mesh(portNavGeo, portNavMat);
+        portNav.position.set(-1.42, 0.1, 0);
+        group.add(portNav);
+
+        const stbdNavGeo = new THREE.SphereGeometry(0.04, 8, 8);
+        const stbdNavMat = new THREE.MeshBasicMaterial({ color: 0x22ff66 });
+        const stbdNav = new THREE.Mesh(stbdNavGeo, stbdNavMat);
+        stbdNav.position.set(1.42, 0.1, 0);
+        group.add(stbdNav);
+
+        // 5. Twin tail booms & canted fins
+        for (const side of [-0.65, 0.65]) {
+          const boomGeo = new THREE.CylinderGeometry(0.03, 0.025, 1.2, 8);
+          boomGeo.rotateX(Math.PI / 2);
+          const boom = new THREE.Mesh(boomGeo, trimMat);
+          boom.position.set(side, 0.04, -0.4);
+          group.add(boom);
+
+          const finGeo = new THREE.BoxGeometry(0.02, 0.32, 0.2);
+          const fin = new THREE.Mesh(finGeo, bodyMat);
+          fin.position.set(side, 0.18, -0.9);
+          fin.rotation.z = (side > 0 ? 1 : -1) * 0.2;
+          group.add(fin);
+        }
+
+        // 6. 4 VTOL Rotor Discs
+        for (const x of [-0.65, 0.65]) {
+          for (const z of [0.15, -0.65]) {
+            const discGeo = new THREE.RingGeometry(0.02, 0.28, 12);
+            discGeo.rotateX(Math.PI / 2);
+            const discMat = new THREE.MeshBasicMaterial({
+              color: roleColor,
+              transparent: true,
+              opacity: 0.35,
+              side: THREE.DoubleSide,
+            });
+            const disc = new THREE.Mesh(discGeo, discMat);
+            disc.position.set(x, 0.12, z);
+            group.add(disc);
+          }
+        }
 
         // Selection ring
-        const ringGeo = new THREE.RingGeometry(1.4, 1.55, 24);
+        const ringGeo = new THREE.RingGeometry(1.6, 1.75, 24);
         ringGeo.rotateX(Math.PI / 2);
         const ringMat = new THREE.MeshBasicMaterial({
           color: 0x35d5e8,
           side: THREE.DoubleSide,
           transparent: true,
-          opacity: 0.8,
+          opacity: 0.85,
         });
         const selectRing = new THREE.Mesh(ringGeo, ringMat);
         selectRing.name = 'selectRing';
