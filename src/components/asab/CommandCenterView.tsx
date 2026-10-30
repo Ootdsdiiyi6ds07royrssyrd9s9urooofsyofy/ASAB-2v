@@ -195,19 +195,19 @@ export const CommandCenterView: React.FC = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div className="p-2 rounded bg-[#111E2D] border border-[#172638]">
-                    <div className="text-[10px] text-[#92A4B8]">ALTITUDE</div>
-                    <div className="text-sm font-bold text-[#35D5E8]">{selectedNode.telemetry.altitude} m</div>
+                    <div className="text-[10px] text-[#92A4B8]">{isArabic ? 'الارتفاع' : 'ALTITUDE'}</div>
+                    <div className="text-sm font-bold text-[#35D5E8]">{selectedNode.telemetry.altitude} {isArabic ? 'م' : 'm'}</div>
                   </div>
                   <div className="p-2 rounded bg-[#111E2D] border border-[#172638]">
-                    <div className="text-[10px] text-[#92A4B8]">AIRSPEED</div>
-                    <div className="text-sm font-bold text-[#35D5E8]">{selectedNode.telemetry.airspeed} km/h</div>
+                    <div className="text-[10px] text-[#92A4B8]">{isArabic ? 'السرعة الجوية' : 'AIRSPEED'}</div>
+                    <div className="text-sm font-bold text-[#35D5E8]">{selectedNode.telemetry.airspeed} {isArabic ? 'كم/س' : 'km/h'}</div>
                   </div>
                   <div className="p-2 rounded bg-[#111E2D] border border-[#172638]">
-                    <div className="text-[10px] text-[#92A4B8]">HEADING</div>
+                    <div className="text-[10px] text-[#92A4B8]">{isArabic ? 'الاتجاه' : 'HEADING'}</div>
                     <div className="text-sm font-bold text-[#EDF4FA]">{selectedNode.telemetry.heading}°</div>
                   </div>
                   <div className="p-2 rounded bg-[#111E2D] border border-[#172638]">
-                    <div className="text-[10px] text-[#92A4B8]">BATTERY</div>
+                    <div className="text-[10px] text-[#92A4B8]">{isArabic ? 'البطارية' : 'BATTERY'}</div>
                     <div className="text-sm font-bold text-[#3DDC97] flex items-center gap-1">
                       <Battery className="w-3.5 h-3.5" />
                       <span>{selectedNode.telemetry.batteryPercent}%</span>
@@ -223,27 +223,27 @@ export const CommandCenterView: React.FC = () => {
                 </div>
                 <div className="space-y-1.5 p-2.5 rounded-lg bg-[#111E2D] border border-[#172638] text-[11px]">
                   <div className="flex justify-between">
-                    <span className="text-[#92A4B8]">Role:</span>
+                    <span className="text-[#92A4B8]">{isArabic ? 'الدور التكتيكي:' : 'Role:'}</span>
                     <span className="text-[#EDF4FA] font-bold">{selectedNode.role}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#92A4B8]">Signal (RSSI):</span>
+                    <span className="text-[#92A4B8]">{isArabic ? 'قوة الإشارة (RSSI):' : 'Signal (RSSI):'}</span>
                     <span className="text-[#35D5E8] font-bold">{selectedNode.telemetry.signalStrength} dBm</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#92A4B8]">Mesh Latency:</span>
-                    <span className="text-[#EDF4FA]">{selectedNode.telemetry.latencyMs} ms</span>
+                    <span className="text-[#92A4B8]">{isArabic ? 'زمن استجابة الشبكة:' : 'Mesh Latency:'}</span>
+                    <span className="text-[#EDF4FA]">{selectedNode.telemetry.latencyMs} {isArabic ? 'م.ث' : 'ms'}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#92A4B8]">Hop Count to GCS:</span>
-                    <span className="text-[#EDF4FA]">{selectedNode.hopCountToGateway} Hops</span>
+                    <span className="text-[#92A4B8]">{isArabic ? 'عدد القفزات للمحطة:' : 'Hop Count to GCS:'}</span>
+                    <span className="text-[#EDF4FA]">{selectedNode.hopCountToGateway} {isArabic ? 'قفزات' : 'Hops'}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#92A4B8]">Crypto Suite:</span>
+                    <span className="text-[#92A4B8]">{isArabic ? 'منظومة التشفير:' : 'Crypto Suite:'}</span>
                     <span className="text-[#3DDC97]">{selectedNode.encryptionStatus}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#92A4B8]">Onboard CPU:</span>
+                    <span className="text-[#92A4B8]">{isArabic ? 'حمل المعالج:' : 'Onboard CPU:'}</span>
                     <span className="text-[#EDF4FA]">{selectedNode.telemetry.cpuLoadPercent}%</span>
                   </div>
                 </div>
@@ -257,7 +257,7 @@ export const CommandCenterView: React.FC = () => {
                 <div className="space-y-1">
                   {nodeLinks.length === 0 ? (
                     <div className="p-2 rounded bg-[#111E2D] text-[#64768B] text-center">
-                      No active RF links
+                      {isArabic ? 'لا توجد روابط راديوية متصلة' : 'No active RF links'}
                     </div>
                   ) : (
                     nodeLinks.map((link) => (
@@ -266,7 +266,7 @@ export const CommandCenterView: React.FC = () => {
                         className="p-1.5 rounded bg-[#111E2D] border border-[#172638] flex items-center justify-between text-[11px]"
                       >
                         <span className="text-[#EDF4FA] truncate max-w-[120px]">{link.id}</span>
-                        <span className="text-[#35D5E8]">{link.quality}% Q</span>
+                        <span className="text-[#35D5E8]">{link.quality}% {isArabic ? 'جودة' : 'Q'}</span>
                         <span className="text-[#92A4B8]">{link.bandwidthMbps} Mbps</span>
                       </div>
                     ))
@@ -295,13 +295,15 @@ export const CommandCenterView: React.FC = () => {
                   }
                   className="py-1.5 rounded bg-[#111E2D] hover:bg-[#172638] border border-[#172638] text-[#EDF4FA] text-[11px] transition-colors"
                 >
-                  {selectedNode.status === 'Active' ? 'SET STANDBY' : 'SET ACTIVE'}
+                  {selectedNode.status === 'Active'
+                    ? isArabic ? 'تعيين كاستعداد' : 'SET STANDBY'
+                    : isArabic ? 'تعيين كنشط' : 'SET ACTIVE'}
                 </button>
                 <button
                   onClick={() => removeNode(selectedNode.id)}
                   className="py-1.5 rounded bg-[#FF5964]/10 hover:bg-[#FF5964]/20 border border-[#FF5964]/30 text-[#FF5964] text-[11px] transition-colors"
                 >
-                  REMOVE NODE
+                  {isArabic ? 'إخراج العقدة' : 'REMOVE NODE'}
                 </button>
               </div>
             </div>
@@ -314,7 +316,9 @@ export const CommandCenterView: React.FC = () => {
         <div className="absolute inset-0 z-50 bg-[#080D16]/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="w-full max-w-md p-5 rounded-xl bg-[#0D1623] border border-[#35D5E8]/40 shadow-2xl space-y-4 font-mono text-xs">
             <div className="flex items-center justify-between pb-2 border-b border-[#172638]">
-              <div className="text-sm font-bold text-[#35D5E8]">DEPLOY VIRTUAL AIRBORNE NODE</div>
+              <div className="text-sm font-bold text-[#35D5E8]">
+                {isArabic ? 'إطلاق ونشر عقدة جوية افتراضية' : 'DEPLOY VIRTUAL AIRBORNE NODE'}
+              </div>
               <button onClick={() => setAddNodeModalOpen(false)} className="text-[#92A4B8] hover:text-[#EDF4FA]">
                 ✕
               </button>
@@ -322,23 +326,25 @@ export const CommandCenterView: React.FC = () => {
 
             <div className="space-y-3">
               <div>
-                <label className="block text-[#92A4B8] mb-1">SELECT MISSION ROLE</label>
+                <label className="block text-[#92A4B8] mb-1">
+                  {isArabic ? 'حدد دور المهمة التكتيكية' : 'SELECT MISSION ROLE'}
+                </label>
                 <select
                   value={newNodeRole}
                   onChange={(e) => setNewNodeRole(e.target.value as any)}
                   className="w-full p-2 rounded bg-[#111E2D] border border-[#172638] text-[#EDF4FA] focus:outline-none focus:border-[#35D5E8]"
                 >
-                  <option value="VTOL Node">VTOL Node (Standard Multi-Mission)</option>
-                  <option value="Relay Node">Relay Node (Backbone Range Extender)</option>
-                  <option value="Gateway Node">Gateway Node (Ground & Satellite Bridge)</option>
-                  <option value="Monitoring Node">Monitoring Node (Sensor & ISR Forward)</option>
+                  <option value="VTOL Node">{isArabic ? 'عقدة VTOL متعددة المهام' : 'VTOL Node (Standard Multi-Mission)'}</option>
+                  <option value="Relay Node">{isArabic ? 'عقدة ترحيل وتوسيع مدى' : 'Relay Node (Backbone Range Extender)'}</option>
+                  <option value="Gateway Node">{isArabic ? 'عقدة بوابة ربط أرضي وأقمار صناعية' : 'Gateway Node (Ground & Satellite Bridge)'}</option>
+                  <option value="Monitoring Node">{isArabic ? 'عقدة رصد واستطلاع أمامي' : 'Monitoring Node (Sensor & ISR Forward)'}</option>
                 </select>
               </div>
 
               <div className="p-3 rounded bg-[#111E2D] border border-[#172638] text-[#92A4B8] text-[11px] space-y-1">
-                <div>Model: <span className="text-[#EDF4FA]">ASAB-V100 VTOL Platform</span></div>
-                <div>RF Mesh: <span className="text-[#35D5E8]">Native Sovereign Decentralized</span></div>
-                <div>Encryption: <span className="text-[#3DDC97]">Hardware ECC Suite</span></div>
+                <div>{isArabic ? 'طراز المنصة:' : 'Model:'} <span className="text-[#EDF4FA]">طائرة ASAB-V100 VTOL</span></div>
+                <div>{isArabic ? 'شبكة التردد:' : 'RF Mesh:'} <span className="text-[#35D5E8]">{isArabic ? 'شبكة عَصَب اللامركزية السيادية' : 'Native Sovereign Decentralized'}</span></div>
+                <div>{isArabic ? 'جناح التشفير:' : 'Encryption:'} <span className="text-[#3DDC97]">{isArabic ? 'جناح ECC السيادي للأجهزة' : 'Hardware ECC Suite'}</span></div>
               </div>
             </div>
 
@@ -347,13 +353,13 @@ export const CommandCenterView: React.FC = () => {
                 onClick={() => setAddNodeModalOpen(false)}
                 className="px-3 py-1.5 rounded bg-[#111E2D] hover:bg-[#172638] text-[#92A4B8]"
               >
-                CANCEL
+                {isArabic ? 'إلغاء' : 'CANCEL'}
               </button>
               <button
                 onClick={handleCreateNode}
                 className="px-4 py-1.5 rounded bg-[#35D5E8] hover:bg-[#25c4d6] text-[#080D16] font-bold"
               >
-                DEPLOY NODE
+                {isArabic ? 'نشر العقدة الآن' : 'DEPLOY NODE'}
               </button>
             </div>
           </div>

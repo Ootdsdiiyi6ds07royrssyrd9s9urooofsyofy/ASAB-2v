@@ -80,7 +80,7 @@ export const ScenarioManagerView: React.FC = () => {
           className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#35D5E8] hover:bg-[#28c5d8] text-[#080D16] font-bold transition-colors"
         >
           <Plus className="w-4 h-4" />
-          <span>CREATE SCENARIO</span>
+          <span>{isArabic ? 'إنشاء سيناريو مخصص' : 'CREATE SCENARIO'}</span>
         </button>
       </div>
 
@@ -101,9 +101,13 @@ export const ScenarioManagerView: React.FC = () => {
               <div className="space-y-2">
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <h3 className="font-bold text-[#EDF4FA] text-sm">{scen.name}</h3>
+                    <h3 className="font-bold text-[#EDF4FA] text-sm">
+                      {isArabic ? (scen.nameAr || scen.name) : scen.name}
+                    </h3>
                     <div className="text-[10px] text-[#35D5E8]">
-                      {isCustom ? 'Custom User Scenario' : 'Standard ASAB Suite'}
+                      {isCustom
+                        ? (isArabic ? 'سيناريو مخصص من المشغل' : 'Custom User Scenario')
+                        : (isArabic ? 'حزمة سيناريوهات عَصَب القياسية' : 'Standard ASAB Suite')}
                     </div>
                   </div>
 
@@ -116,7 +120,9 @@ export const ScenarioManagerView: React.FC = () => {
                         : 'bg-[#F5B82E]/20 text-[#F5B82E]'
                     }`}
                   >
-                    {scen.difficulty}
+                    {isArabic
+                      ? (scen.difficulty === 'Basic' ? 'مبتدئ' : scen.difficulty === 'Intermediate' ? 'متوسط' : 'متقدم')
+                      : scen.difficulty}
                   </span>
                 </div>
 
@@ -125,8 +131,8 @@ export const ScenarioManagerView: React.FC = () => {
                 </p>
 
                 <div className="p-2.5 rounded-lg bg-[#111E2D] border border-[#172638] text-[10px] space-y-1">
-                  <div>Duration: <span className="text-[#EDF4FA] font-bold">{scen.durationSec}s</span></div>
-                  <div>Trigger: <span className="text-[#35D5E8]">{scen.triggerEvent}</span></div>
+                  <div>{isArabic ? 'المدة:' : 'Duration:'} <span className="text-[#EDF4FA] font-bold">{scen.durationSec} {isArabic ? 'ثانية' : 's'}</span></div>
+                  <div>{isArabic ? 'المحفز العملياتي:' : 'Trigger:'} <span className="text-[#35D5E8]">{scen.triggerEvent}</span></div>
                 </div>
               </div>
 
@@ -135,12 +141,12 @@ export const ScenarioManagerView: React.FC = () => {
                   <button
                     onClick={() => handleDelete(scen.id)}
                     className="p-1.5 rounded bg-[#FF5964]/10 hover:bg-[#FF5964]/20 text-[#FF5964] border border-[#FF5964]/30"
-                    title="Delete Custom Scenario"
+                    title={isArabic ? 'حذف السيناريو المخصص' : 'Delete Custom Scenario'}
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 ) : (
-                  <div className="text-[10px] text-[#64768B]">READ-ONLY</div>
+                  <div className="text-[10px] text-[#64768B]">{isArabic ? 'للقراءة فقط' : 'READ-ONLY'}</div>
                 )}
 
                 <button
@@ -151,7 +157,7 @@ export const ScenarioManagerView: React.FC = () => {
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#35D5E8] hover:bg-[#28c5d8] text-[#080D16] font-bold text-xs transition-colors"
                 >
                   <Play className="w-3.5 h-3.5" />
-                  <span>LOAD & RUN</span>
+                  <span>{isArabic ? 'تحميل وتشغيل' : 'LOAD & RUN'}</span>
                 </button>
               </div>
             </div>
@@ -164,16 +170,18 @@ export const ScenarioManagerView: React.FC = () => {
         <div className="fixed inset-0 z-50 bg-[#080D16]/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="w-full max-w-md p-5 rounded-xl bg-[#0D1623] border border-[#35D5E8]/40 shadow-2xl space-y-4 font-mono text-xs">
             <div className="flex items-center justify-between pb-2 border-b border-[#172638]">
-              <div className="text-sm font-bold text-[#35D5E8]">CREATE CUSTOM SCENARIO</div>
-              <button onClick={() => setModalOpen(false)} className="text-[#92A4B8]">✕</button>
+              <div className="text-sm font-bold text-[#35D5E8]">
+                {isArabic ? 'إنشاء سيناريو محاكاة مخصص' : 'CREATE CUSTOM SCENARIO'}
+              </div>
+              <button onClick={() => setModalOpen(false)} className="text-[#92A4B8] hover:text-white">✕</button>
             </div>
 
             <div className="space-y-3">
               <div>
-                <label className="block text-[#92A4B8] mb-1">SCENARIO NAME</label>
+                <label className="block text-[#92A4B8] mb-1">{isArabic ? 'اسم السيناريو' : 'SCENARIO NAME'}</label>
                 <input
                   type="text"
-                  placeholder="e.g. High-Altitude Electronic Reconnaissance"
+                  placeholder={isArabic ? 'مثال: استطلاع إلكتروني على ارتفاعات شاهقة' : 'e.g. High-Altitude Electronic Reconnaissance'}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="w-full p-2 rounded bg-[#111E2D] border border-[#172638] text-[#EDF4FA] focus:outline-none focus:border-[#35D5E8]"
@@ -181,10 +189,10 @@ export const ScenarioManagerView: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-[#92A4B8] mb-1">DESCRIPTION</label>
+                <label className="block text-[#92A4B8] mb-1">{isArabic ? 'الوصف والأهداف' : 'DESCRIPTION'}</label>
                 <textarea
                   rows={3}
-                  placeholder="Describe flight conditions, threats, and objectives..."
+                  placeholder={isArabic ? 'صف ظروف الطيران والتهديدات والأهداف المرجوة...' : 'Describe flight conditions, threats, and objectives...'}
                   value={desc}
                   onChange={(e) => setDesc(e.target.value)}
                   className="w-full p-2 rounded bg-[#111E2D] border border-[#172638] text-[#EDF4FA] focus:outline-none focus:border-[#35D5E8]"
@@ -193,21 +201,21 @@ export const ScenarioManagerView: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[#92A4B8] mb-1">DIFFICULTY</label>
+                  <label className="block text-[#92A4B8] mb-1">{isArabic ? 'مستوى الصعوبة' : 'DIFFICULTY'}</label>
                   <select
                     value={difficulty}
                     onChange={(e) => setDifficulty(e.target.value as any)}
                     className="w-full p-2 rounded bg-[#111E2D] border border-[#172638] text-[#EDF4FA]"
                   >
-                    <option value="Basic">Basic</option>
-                    <option value="Intermediate">Intermediate</option>
-                    <option value="Advanced">Advanced</option>
-                    <option value="Stress Test">Stress Test</option>
+                    <option value="Basic">{isArabic ? 'مبتدئ' : 'Basic'}</option>
+                    <option value="Intermediate">{isArabic ? 'متوسط' : 'Intermediate'}</option>
+                    <option value="Advanced">{isArabic ? 'متقدم' : 'Advanced'}</option>
+                    <option value="Stress Test">{isArabic ? 'اختبار ضغط' : 'Stress Test'}</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-[#92A4B8] mb-1">DURATION (SEC)</label>
+                  <label className="block text-[#92A4B8] mb-1">{isArabic ? 'المدة (بالثواني)' : 'DURATION (SEC)'}</label>
                   <input
                     type="number"
                     min="15"
@@ -222,10 +230,10 @@ export const ScenarioManagerView: React.FC = () => {
 
             <div className="flex justify-end gap-2 pt-2 border-t border-[#172638]">
               <button onClick={() => setModalOpen(false)} className="px-3 py-1.5 rounded bg-[#111E2D] text-[#92A4B8]">
-                CANCEL
+                {isArabic ? 'إلغاء' : 'CANCEL'}
               </button>
-              <button onClick={handleCreate} className="px-4 py-1.5 rounded bg-[#35D5E8] text-[#080D16] font-bold">
-                SAVE SCENARIO
+              <button onClick={handleCreate} className="px-4 py-1.5 rounded bg-[#35D5E8] text-[#080D16] font-bold hover:brightness-110">
+                {isArabic ? 'حفظ السيناريو' : 'SAVE SCENARIO'}
               </button>
             </div>
           </div>

@@ -477,11 +477,16 @@ export const FlightSimulator3DCanvas: React.FC<FlightSimProps> = ({
         {/* Top HUD Bar */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3 px-3 py-1.5 rounded-lg bg-[#111E2D]/85 border border-[#172638] text-xs font-mono text-[#EDF4FA]">
-            <div>TRAINING SCENARIO: <span className="text-[#35D5E8] font-bold">{activeScenario}</span></div>
+            <div>المهمة التدريبية: <span className="text-[#35D5E8] font-bold">{activeScenario}</span></div>
             <div className="w-px h-3 bg-[#172638]" />
-            <div>MODE: <span className={telemetry.vtolMode ? 'text-[#F5B82E]' : 'text-[#3DDC97]'}>{telemetry.vtolMode ? 'VTOL LIFT' : 'FIXED WING CRUISE'}</span></div>
+            <div>
+              النمط:{' '}
+              <span className={telemetry.vtolMode ? 'text-[#F5B82E] font-bold' : 'text-[#3DDC97] font-bold'}>
+                {telemetry.vtolMode ? 'رفع عمودي (VTOL)' : 'طيران أمامي مثبت الأجنحة'}
+              </span>
+            </div>
             <div className="w-px h-3 bg-[#172638]" />
-            <div>G-FORCE: <span className="text-[#35D5E8]">{telemetry.gForce} G</span></div>
+            <div>قوة G: <span className="text-[#35D5E8] font-bold">{telemetry.gForce} G</span></div>
           </div>
 
           {/* Camera Selectors */}
@@ -490,19 +495,19 @@ export const FlightSimulator3DCanvas: React.FC<FlightSimProps> = ({
               onClick={() => setCameraMode('chase')}
               className={`px-2.5 py-1 text-xs font-mono rounded ${cameraMode === 'chase' ? 'bg-[#35D5E8] text-[#080D16] font-bold' : 'text-[#92A4B8] hover:text-[#EDF4FA]'}`}
             >
-              CHASE CAM
+              كاميرا المطاردة
             </button>
             <button
               onClick={() => setCameraMode('cockpit')}
               className={`px-2.5 py-1 text-xs font-mono rounded ${cameraMode === 'cockpit' ? 'bg-[#35D5E8] text-[#080D16] font-bold' : 'text-[#92A4B8] hover:text-[#EDF4FA]'}`}
             >
-              COCKPIT HUD
+              قمرة القيادة HUD
             </button>
             <button
               onClick={() => setCameraMode('free')}
               className={`px-2.5 py-1 text-xs font-mono rounded ${cameraMode === 'free' ? 'bg-[#35D5E8] text-[#080D16] font-bold' : 'text-[#92A4B8] hover:text-[#EDF4FA]'}`}
             >
-              SIDE PROFILE
+              منظور خارجي
             </button>
           </div>
         </div>
@@ -532,29 +537,38 @@ export const FlightSimulator3DCanvas: React.FC<FlightSimProps> = ({
         <div className="flex items-end justify-between">
           {/* Airspeed Gauge Tape */}
           <div className="flex flex-col gap-1 p-3 rounded-lg bg-[#111E2D]/85 border border-[#172638] font-mono text-xs w-36">
-            <div className="text-[10px] text-[#92A4B8]">AIRSPEED</div>
-            <div className="text-2xl font-bold text-[#35D5E8]">{telemetry.airspeedKmh} <span className="text-xs font-normal text-[#92A4B8]">KM/H</span></div>
-            <div className="text-[10px] text-[#92A4B8]">STATUS: {telemetry.status}</div>
+            <div className="text-[10px] text-[#92A4B8]">السرعة الجوية</div>
+            <div className="text-2xl font-bold text-[#35D5E8]">{telemetry.airspeedKmh} <span className="text-xs font-normal text-[#92A4B8]">كم/س</span></div>
+            <div className="text-[10px] text-[#92A4B8]">
+              الحالة:{' '}
+              {telemetry.status === 'Pre-flight'
+                ? 'جاهز للإقلاع'
+                : telemetry.status === 'Takeoff Roll'
+                ? 'تدحرج وتسارع'
+                : telemetry.status === 'Climb'
+                ? 'صعود جوي'
+                : 'طيران مستقر'}
+            </div>
           </div>
 
           {/* Heading Tape Center */}
           <div className="flex flex-col items-center gap-1 p-2 rounded-lg bg-[#111E2D]/85 border border-[#172638] font-mono text-xs">
-            <div className="text-[10px] text-[#92A4B8]">HEADING COMPASS</div>
+            <div className="text-[10px] text-[#92A4B8]">بوصلة الاتجاه الجوي</div>
             <div className="text-lg font-bold text-[#EDF4FA] tracking-wider">{telemetry.headingDeg}°</div>
-            <div className="text-[10px] text-[#3DDC97]">W / S: Pitch | A / D: Roll | Q / E: Yaw</div>
+            <div className="text-[10px] text-[#3DDC97]">W / S: الميلان الرأسي | A / D: الدوران الجانبي | Q / E: الانعطاف</div>
           </div>
 
           {/* Altimeter & Throttle */}
           <div className="flex items-center gap-3">
             <div className="flex flex-col gap-1 p-3 rounded-lg bg-[#111E2D]/85 border border-[#172638] font-mono text-xs w-36 text-right">
-              <div className="text-[10px] text-[#92A4B8]">ALTITUDE</div>
-              <div className="text-2xl font-bold text-[#3DDC97]">{telemetry.altitudeM} <span className="text-xs font-normal text-[#92A4B8]">M</span></div>
-              <div className="text-[10px] text-[#92A4B8]">PITCH: {telemetry.pitchDeg}°</div>
+              <div className="text-[10px] text-[#92A4B8]">الارتفاع</div>
+              <div className="text-2xl font-bold text-[#3DDC97]">{telemetry.altitudeM} <span className="text-xs font-normal text-[#92A4B8]">متر</span></div>
+              <div className="text-[10px] text-[#92A4B8]">زاوية الميل: {telemetry.pitchDeg}°</div>
             </div>
 
             {/* Interactive Throttle Slider */}
             <div className="pointer-events-auto p-3 rounded-lg bg-[#111E2D]/90 border border-[#172638] flex flex-col items-center gap-1 font-mono text-xs">
-              <div className="text-[10px] text-[#92A4B8]">THROTTLE</div>
+              <div className="text-[10px] text-[#92A4B8]">الدفع (THROTTLE)</div>
               <input
                 type="range"
                 min="0"

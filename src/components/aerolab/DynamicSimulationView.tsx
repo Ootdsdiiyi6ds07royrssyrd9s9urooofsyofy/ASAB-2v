@@ -69,14 +69,14 @@ export const DynamicSimulationView: React.FC = () => {
             }`}
           >
             {isSimRunning ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-            <span>{isSimRunning ? 'PAUSE' : 'RESUME'}</span>
+            <span>{isSimRunning ? (isArabic ? 'إيقاف مؤقت' : 'PAUSE') : (isArabic ? 'تشغيل' : 'RESUME')}</span>
           </button>
           <button
             onClick={handleReset}
             className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#111E2D] hover:bg-[#172638] border border-[#172638] text-[#EDF4FA] transition-colors"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span>RESET</span>
+            <span>{isArabic ? 'إعادة ضبط' : 'RESET'}</span>
           </button>
         </div>
       </div>
@@ -86,37 +86,37 @@ export const DynamicSimulationView: React.FC = () => {
         {/* Lift Force */}
         <div className="p-4 rounded-xl bg-[#0D1623] border border-[#172638] space-y-1">
           <div className="flex items-center justify-between text-[#92A4B8]">
-            <span>LIFT FORCE (L)</span>
+            <span>{isArabic ? 'قوة الرفع (L)' : 'LIFT FORCE (L)'}</span>
             <ArrowUp className="w-4 h-4 text-[#3DDC97]" />
           </div>
           <div className="text-2xl font-bold text-[#3DDC97]">{aero.liftNewtons} <span className="text-xs font-normal">N</span></div>
-          <div className="text-[10px] text-[#64768B]">Vs Gravity: {aero.gravityNewtons} N</div>
+          <div className="text-[10px] text-[#64768B]">{isArabic ? 'مقابل الجاذبية' : 'Vs Gravity'}: {aero.gravityNewtons} N</div>
         </div>
 
         {/* Drag Force */}
         <div className="p-4 rounded-xl bg-[#0D1623] border border-[#172638] space-y-1">
           <div className="flex items-center justify-between text-[#92A4B8]">
-            <span>DRAG FORCE (D)</span>
+            <span>{isArabic ? 'قوة السحب (D)' : 'DRAG FORCE (D)'}</span>
             <ArrowRight className="w-4 h-4 text-[#FF5964]" />
           </div>
           <div className="text-2xl font-bold text-[#FF5964]">{aero.dragNewtons} <span className="text-xs font-normal">N</span></div>
-          <div className="text-[10px] text-[#64768B]">Parasitic + Induced</div>
+          <div className="text-[10px] text-[#64768B]">{isArabic ? 'سحب طفيلي + حثي' : 'Parasitic + Induced'}</div>
         </div>
 
         {/* Lift-to-Drag Ratio */}
         <div className="p-4 rounded-xl bg-[#0D1623] border border-[#172638] space-y-1">
           <div className="flex items-center justify-between text-[#92A4B8]">
-            <span>LIFT / DRAG (L/D)</span>
+            <span>{isArabic ? 'نسبة الرفع / السحب (L/D)' : 'LIFT / DRAG (L/D)'}</span>
             <TrendingUp className="w-4 h-4 text-[#35D5E8]" />
           </div>
           <div className="text-2xl font-bold text-[#35D5E8]">{aero.liftToDragRatio}</div>
-          <div className="text-[10px] text-[#64768B]">Aerodynamic Efficiency</div>
+          <div className="text-[10px] text-[#64768B]">{isArabic ? 'الكفاءة الأيروديناميكية' : 'Aerodynamic Efficiency'}</div>
         </div>
 
         {/* Dynamic Pressure */}
         <div className="p-4 rounded-xl bg-[#0D1623] border border-[#172638] space-y-1">
           <div className="flex items-center justify-between text-[#92A4B8]">
-            <span>DYNAMIC PRESSURE (q)</span>
+            <span>{isArabic ? 'الضغط الديناميكي (q)' : 'DYNAMIC PRESSURE (q)'}</span>
             <Activity className="w-4 h-4 text-[#F5B82E]" />
           </div>
           <div className="text-2xl font-bold text-[#F5B82E]">{aero.dynamicPressurePa} <span className="text-xs font-normal">Pa</span></div>
@@ -129,15 +129,15 @@ export const DynamicSimulationView: React.FC = () => {
         {/* Sliders Control Panel */}
         <div className="p-5 rounded-xl bg-[#0D1623] border border-[#172638] space-y-4">
           <div className="text-sm font-bold text-[#EDF4FA] flex items-center justify-between pb-2 border-b border-[#172638]">
-            <span>FLIGHT REGIME PARAMETERS</span>
+            <span>{isArabic ? 'معايير نظام الطيران' : 'FLIGHT REGIME PARAMETERS'}</span>
             <Sliders className="w-4 h-4 text-[#35D5E8]" />
           </div>
 
           {/* Airspeed Slider */}
           <div className="space-y-1.5">
             <div className="flex justify-between text-[11px]">
-              <span className="text-[#92A4B8]">AIRSPEED (V):</span>
-              <span className="text-[#35D5E8] font-bold">{airspeedKmh} km/h ({(airspeedKmh / 3.6).toFixed(1)} m/s)</span>
+              <span className="text-[#92A4B8]">{isArabic ? 'السرعة الجوية (V):' : 'AIRSPEED (V):'}</span>
+              <span className="text-[#35D5E8] font-bold">{airspeedKmh} كم/س ({(airspeedKmh / 3.6).toFixed(1)} م/ث)</span>
             </div>
             <input
               type="range"
@@ -152,7 +152,7 @@ export const DynamicSimulationView: React.FC = () => {
           {/* Pitch / Angle of Attack Slider */}
           <div className="space-y-1.5">
             <div className="flex justify-between text-[11px]">
-              <span className="text-[#92A4B8]">PITCH / ANGLE OF ATTACK (α):</span>
+              <span className="text-[#92A4B8]">{isArabic ? 'زاوية الانحدار / الهجوم (α):' : 'PITCH / ANGLE OF ATTACK (α):'}</span>
               <span className="text-[#35D5E8] font-bold">{pitchDeg}°</span>
             </div>
             <input
@@ -168,8 +168,8 @@ export const DynamicSimulationView: React.FC = () => {
           {/* Aircraft Mass Slider */}
           <div className="space-y-1.5">
             <div className="flex justify-between text-[11px]">
-              <span className="text-[#92A4B8]">AIRCRAFT ALL-UP MASS (m):</span>
-              <span className="text-[#35D5E8] font-bold">{massKg} kg</span>
+              <span className="text-[#92A4B8]">{isArabic ? 'الكتلة الإجمالية (m):' : 'AIRCRAFT ALL-UP MASS (m):'}</span>
+              <span className="text-[#35D5E8] font-bold">{massKg} كغ</span>
             </div>
             <input
               type="range"
@@ -185,8 +185,8 @@ export const DynamicSimulationView: React.FC = () => {
           {/* Wind Speed Slider */}
           <div className="space-y-1.5">
             <div className="flex justify-between text-[11px]">
-              <span className="text-[#92A4B8]">ENVIRONMENTAL WIND INTENSITY:</span>
-              <span className="text-[#F5B82E] font-bold">{windSpeedKmh} km/h</span>
+              <span className="text-[#92A4B8]">{isArabic ? 'شدة الرياح الجوية:' : 'ENVIRONMENTAL WIND INTENSITY:'}</span>
+              <span className="text-[#F5B82E] font-bold">{windSpeedKmh} كم/س</span>
             </div>
             <input
               type="range"
@@ -202,9 +202,11 @@ export const DynamicSimulationView: React.FC = () => {
         {/* 2D Free-Body Force Equilibrium Diagram */}
         <div className="p-5 rounded-xl bg-[#0D1623] border border-[#172638] flex flex-col justify-between space-y-4">
           <div className="text-sm font-bold text-[#EDF4FA] flex items-center justify-between pb-2 border-b border-[#172638]">
-            <span>FREE-BODY FORCE EQUILIBRIUM</span>
+            <span>{isArabic ? 'توازن القوى للجسم الحر' : 'FREE-BODY FORCE EQUILIBRIUM'}</span>
             <span className="text-[10px] text-[#3DDC97]">
-              {aero.verticalAcceleration >= 0 ? `Climbing (+${aero.verticalAcceleration} m/s²)` : `Descending (${aero.verticalAcceleration} m/s²)`}
+              {aero.verticalAcceleration >= 0
+                ? (isArabic ? `صعود (+${aero.verticalAcceleration} م/ث²)` : `Climbing (+${aero.verticalAcceleration} m/s²)`)
+                : (isArabic ? `هبوط (${aero.verticalAcceleration} م/ث²)` : `Descending (${aero.verticalAcceleration} m/s²)`)}
             </span>
           </div>
 
@@ -243,7 +245,9 @@ export const DynamicSimulationView: React.FC = () => {
           <div className="flex items-center gap-2 p-2.5 rounded-lg bg-[#111E2D] border border-[#172638] text-[10px] text-[#92A4B8]">
             <Info className="w-4 h-4 text-[#35D5E8] shrink-0" />
             <span>
-              EDUCATIONAL SIMULATION: Mathematical representation for aerodynamic education, not certified for FAA/EASA avionics.
+              {isArabic
+                ? 'محاكاة تعليمية: تمثيل رياضي لديناميكا الطيران للأغراض التدريبية والبحثية، غير مخصص كبرمجية تحكم معتمدة.'
+                : 'EDUCATIONAL SIMULATION: Mathematical representation for aerodynamic education, not certified for FAA/EASA avionics.'}
             </span>
           </div>
         </div>

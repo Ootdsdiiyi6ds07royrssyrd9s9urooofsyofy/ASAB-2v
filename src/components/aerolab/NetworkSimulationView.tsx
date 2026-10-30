@@ -77,14 +77,14 @@ export const NetworkSimulationView: React.FC = () => {
             }`}
           >
             {isSimRunning ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-            <span>{isSimRunning ? 'PAUSE' : 'RESUME'}</span>
+            <span>{isSimRunning ? (isArabic ? 'إيقاف مؤقت' : 'PAUSE') : (isArabic ? 'تشغيل' : 'RESUME')}</span>
           </button>
           <button
             onClick={handleReset}
             className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#111E2D] hover:bg-[#172638] border border-[#172638] text-[#EDF4FA] transition-colors"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span>RESET COUNTERS</span>
+            <span>{isArabic ? 'تصفير العدادات' : 'RESET COUNTERS'}</span>
           </button>
         </div>
       </div>
@@ -92,27 +92,33 @@ export const NetworkSimulationView: React.FC = () => {
       {/* Real-time Packet Counters */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="p-4 rounded-xl bg-[#0D1623] border border-[#172638] space-y-1">
-          <div className="text-[10px] text-[#92A4B8]">PACKETS TRANSMITTED</div>
+          <div className="text-[10px] text-[#92A4B8]">{isArabic ? 'الحزم المرسلة' : 'PACKETS TRANSMITTED'}</div>
           <div className="text-2xl font-bold text-[#EDF4FA]">{txPackets}</div>
-          <div className="text-[10px] text-[#64768B]">At {packetGenerationRateHz} Hz rate</div>
+          <div className="text-[10px] text-[#64768B]">
+            {isArabic ? `بمعدل ${packetGenerationRateHz} هرتز` : `At ${packetGenerationRateHz} Hz rate`}
+          </div>
         </div>
 
         <div className="p-4 rounded-xl bg-[#0D1623] border border-[#172638] space-y-1">
-          <div className="text-[10px] text-[#92A4B8]">PACKETS RECEIVED</div>
+          <div className="text-[10px] text-[#92A4B8]">{isArabic ? 'الحزم المستلمة' : 'PACKETS RECEIVED'}</div>
           <div className="text-2xl font-bold text-[#3DDC97]">{rxPackets}</div>
-          <div className="text-[10px] text-[#64768B]">Validated Cryptographically</div>
+          <div className="text-[10px] text-[#64768B]">{isArabic ? 'محققة وموثقة سيادياً' : 'Validated Cryptographically'}</div>
         </div>
 
         <div className="p-4 rounded-xl bg-[#0D1623] border border-[#172638] space-y-1">
-          <div className="text-[10px] text-[#92A4B8]">DELIVERY RATIO (PDR)</div>
+          <div className="text-[10px] text-[#92A4B8]">{isArabic ? 'معدل تسليم الحزم (PDR)' : 'DELIVERY RATIO (PDR)'}</div>
           <div className="text-2xl font-bold text-[#35D5E8]">{pdr}%</div>
-          <div className="text-[10px] text-[#64768B]">Loss: {(100 - pdr).toFixed(1)}%</div>
+          <div className="text-[10px] text-[#64768B]">{isArabic ? 'الفقد:' : 'Loss:'} {(100 - pdr).toFixed(1)}%</div>
         </div>
 
         <div className="p-4 rounded-xl bg-[#0D1623] border border-[#172638] space-y-1">
-          <div className="text-[10px] text-[#92A4B8]">END-TO-END LATENCY</div>
-          <div className="text-2xl font-bold text-[#F5B82E]">{totalLatency} <span className="text-xs font-normal">MS</span></div>
-          <div className="text-[10px] text-[#64768B]">{activeHopCount} Hops × {hopLatency}ms</div>
+          <div className="text-[10px] text-[#92A4B8]">{isArabic ? 'زمن الوصول الإجمالي' : 'END-TO-END LATENCY'}</div>
+          <div className="text-2xl font-bold text-[#F5B82E]">
+            {totalLatency} <span className="text-xs font-normal">{isArabic ? 'مللي ثانية' : 'MS'}</span>
+          </div>
+          <div className="text-[10px] text-[#64768B]">
+            {isArabic ? `${activeHopCount} قفزات × ${hopLatency} مللي ثانية` : `${activeHopCount} Hops × ${hopLatency}ms`}
+          </div>
         </div>
       </div>
 
@@ -121,13 +127,13 @@ export const NetworkSimulationView: React.FC = () => {
         {/* Environmental Parameter Controls */}
         <div className="p-5 rounded-xl bg-[#0D1623] border border-[#172638] space-y-4">
           <div className="text-sm font-bold text-[#EDF4FA] pb-2 border-b border-[#172638]">
-            RF SPECTRUM & HOP CONFIGURATION
+            {isArabic ? 'إعدادات الطيف الراديوي والقفزات' : 'RF SPECTRUM & HOP CONFIGURATION'}
           </div>
 
           {/* RF Noise Floor Slider */}
           <div className="space-y-1.5">
             <div className="flex justify-between text-[11px]">
-              <span className="text-[#92A4B8]">ENVIRONMENTAL NOISE FLOOR:</span>
+              <span className="text-[#92A4B8]">{isArabic ? 'مستوى الضوضاء البيئية (Noise Floor):' : 'ENVIRONMENTAL NOISE FLOOR:'}</span>
               <span className="text-[#F5B82E] font-bold">{rfNoiseDbm} dBm (SNR: {snr} dB)</span>
             </div>
             <input
@@ -139,17 +145,19 @@ export const NetworkSimulationView: React.FC = () => {
               className="w-full appearance-none h-1.5 rounded-full bg-[#111E2D] accent-[#F5B82E] cursor-pointer"
             />
             <div className="flex justify-between text-[10px] text-[#64768B]">
-              <span>-110 dBm (Clear Sky)</span>
-              <span>-85 dBm (Storm)</span>
-              <span>-60 dBm (Extreme Jamming)</span>
+              <span>{isArabic ? '-110 dBm (بيئة نقية)' : '-110 dBm (Clear Sky)'}</span>
+              <span>{isArabic ? '-85 dBm (عواصف/تداخل)' : '-85 dBm (Storm)'}</span>
+              <span>{isArabic ? '-60 dBm (تشويش شديد)' : '-60 dBm (Extreme Jamming)'}</span>
             </div>
           </div>
 
           {/* Multi-Hop Count */}
           <div className="space-y-1.5">
             <div className="flex justify-between text-[11px]">
-              <span className="text-[#92A4B8]">MULTI-HOP RELAY COUNT:</span>
-              <span className="text-[#35D5E8] font-bold">{activeHopCount} Hops</span>
+              <span className="text-[#92A4B8]">{isArabic ? 'عدد قفزات الترحيل المتعددة:' : 'MULTI-HOP RELAY COUNT:'}</span>
+              <span className="text-[#35D5E8] font-bold">
+                {activeHopCount} {isArabic ? 'قفزات' : 'Hops'}
+              </span>
             </div>
             <input
               type="range"
@@ -164,8 +172,10 @@ export const NetworkSimulationView: React.FC = () => {
           {/* Packet Generation Frequency */}
           <div className="space-y-1.5">
             <div className="flex justify-between text-[11px]">
-              <span className="text-[#92A4B8]">TELEMETRY STREAM RATE:</span>
-              <span className="text-[#EDF4FA] font-bold">{packetGenerationRateHz} Packets/sec</span>
+              <span className="text-[#92A4B8]">{isArabic ? 'معدل تدفق بيانات القياس:' : 'TELEMETRY STREAM RATE:'}</span>
+              <span className="text-[#EDF4FA] font-bold">
+                {packetGenerationRateHz} {isArabic ? 'حزمة/ثانية' : 'Packets/sec'}
+              </span>
             </div>
             <input
               type="range"
@@ -181,27 +191,37 @@ export const NetworkSimulationView: React.FC = () => {
         {/* Multi-Hop Route Comparison Card */}
         <div className="p-5 rounded-xl bg-[#0D1623] border border-[#172638] flex flex-col justify-between space-y-4">
           <div className="text-sm font-bold text-[#EDF4FA] pb-2 border-b border-[#172638]">
-            MULTI-HOP VS DIRECT LINK COMPARISON
+            {isArabic ? 'مقارنة التوجيه المتعدد بالربط المباشر' : 'MULTI-HOP VS DIRECT LINK COMPARISON'}
           </div>
 
           <div className="space-y-3">
             <div className="p-3 rounded-lg bg-[#111E2D] border border-[#172638] space-y-1">
-              <div className="text-[#35D5E8] font-bold">Configured Multi-Hop Path ({activeHopCount} Hops)</div>
+              <div className="text-[#35D5E8] font-bold">
+                {isArabic ? `مسار الترحيل المتعدد النشط (${activeHopCount} قفزات)` : `Configured Multi-Hop Path (${activeHopCount} Hops)`}
+              </div>
               <p className="text-[11px] text-[#92A4B8] font-sans">
-                Maintains continuous link connection around mountains or terrain obstacles with {totalLatency}ms latency and {pdr}% delivery ratio.
+                {isArabic
+                  ? `يحافظ على الاتصال المتواصل متجاوزاً حجب التضاريس والجبال بزمن استجابة ${totalLatency} مللي ثانية ونسبة تسليم ${pdr}%.`
+                  : `Maintains continuous link connection around mountains or terrain obstacles with ${totalLatency}ms latency and ${pdr}% delivery ratio.`}
               </p>
             </div>
 
             <div className="p-3 rounded-lg bg-[#111E2D] border border-[#172638] space-y-1">
-              <div className="text-[#92A4B8] font-bold">Hypothetical Single-Hop Direct Link (Line of Sight)</div>
+              <div className="text-[#92A4B8] font-bold">
+                {isArabic ? 'الاتصال المباشر الفردي (خط الرؤية البصري LoS)' : 'Hypothetical Single-Hop Direct Link (Line of Sight)'}
+              </div>
               <p className="text-[11px] text-[#92A4B8] font-sans">
-                Would suffer signal attenuation &gt; 35dB beyond 30 km without relay nodes, dropping delivery ratio below 20%.
+                {isArabic
+                  ? 'يعاني من تلاشي الإشارة الشديد (>35dB) عند تجاوز 30 كم دون عقد وسيطة، مما يهبط بنسبة التسليم إلى أقل من 20%.'
+                  : 'Would suffer signal attenuation > 35dB beyond 30 km without relay nodes, dropping delivery ratio below 20%.'}
               </p>
             </div>
           </div>
 
           <div className="p-3 rounded-lg bg-[#111E2D]/50 border border-[#172638] text-[10px] text-[#92A4B8]">
-            SIMULATION NOTE: Educational representation of free-space path loss and stochastic packet drop.
+            {isArabic
+              ? 'ملاحظة تعليمية: تمثيل محاكاة لانحسار الإشارة في الفضاء الحر ونموذج الاحتمالات العشوائية لتساقط الحزم.'
+              : 'SIMULATION NOTE: Educational representation of free-space path loss and stochastic packet drop.'}
           </div>
         </div>
       </div>

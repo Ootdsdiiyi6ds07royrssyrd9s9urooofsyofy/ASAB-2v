@@ -100,13 +100,14 @@ export const SimulationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     const saved = localStorage.getItem('asab_settings');
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        return { ...parsed, language: 'ar' };
       } catch (e) {
         // ignore parse error
       }
     }
     return {
-      language: 'en',
+      language: 'ar',
       quality: 'high',
       audioEnabled: true,
       simulationSpeed: 1,

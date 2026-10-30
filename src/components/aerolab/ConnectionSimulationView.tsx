@@ -35,14 +35,86 @@ export const ConnectionSimulationView: React.FC = () => {
   const [injectedFaultId, setInjectedFaultId] = useState<string | null>(null);
 
   const initialNodes: AvionicsNode[] = [
-    { id: 'battery', name: 'Solid-State Battery Pack', type: 'Power', voltage: '50.4 V', current: '18.4 A', status: 'Nominal', x: 80, y: 160 },
-    { id: 'pdb', name: 'Power Distribution Unit', type: 'Power', voltage: '50.4 V / 24 V / 12 V', current: '18.4 A', status: 'Nominal', x: 260, y: 160 },
-    { id: 'fc', name: 'ASAB Flight Controller & Mesh Router', type: 'Logic', voltage: '12.0 V', current: '2.5 A', status: 'Nominal', x: 440, y: 160 },
-    { id: 'imu_sensors', name: 'Triple Redundant IMU & Sensors', type: 'Sensor', voltage: '5.0 V', current: '0.4 A', status: 'Nominal', x: 440, y: 40 },
-    { id: 'rf_mesh', name: 'Sovereign RF Transceiver Array', type: 'RF', voltage: '12.0 V', current: '3.2 A', status: 'Nominal', x: 620, y: 80 },
-    { id: 'gimbal', name: 'EO/IR 3-Axis Gimbal Pod', type: 'Sensor', voltage: '24.0 V', current: '1.4 A', status: 'Nominal', x: 620, y: 240 },
-    { id: 'vtol_esc_1', name: 'VTOL ESC & Motor 1 (Fwd Port)', type: 'Actuator', voltage: '50.4 V', current: '14.2 A', status: 'Nominal', x: 260, y: 320 },
-    { id: 'pusher_esc', name: 'Cruise Pusher ESC & Motor', type: 'Actuator', voltage: '50.4 V', current: '8.5 A', status: 'Nominal', x: 440, y: 320 },
+    {
+      id: 'battery',
+      name: isArabic ? 'حزمة بطاريات الحالة الصلبة' : 'Solid-State Battery Pack',
+      type: 'Power',
+      voltage: '50.4 V',
+      current: '18.4 A',
+      status: 'Nominal',
+      x: 80,
+      y: 160,
+    },
+    {
+      id: 'pdb',
+      name: isArabic ? 'وحدة توزيع الطاقة المركزية' : 'Power Distribution Unit',
+      type: 'Power',
+      voltage: '50.4 V / 24 V / 12 V',
+      current: '18.4 A',
+      status: 'Nominal',
+      x: 260,
+      y: 160,
+    },
+    {
+      id: 'fc',
+      name: isArabic ? 'حاسوب الطيران وموجّه الشبكة' : 'ASAB Flight Controller & Mesh Router',
+      type: 'Logic',
+      voltage: '12.0 V',
+      current: '2.5 A',
+      status: 'Nominal',
+      x: 440,
+      y: 160,
+    },
+    {
+      id: 'imu_sensors',
+      name: isArabic ? 'مستشعرات القصور الذاتي المزدوجة' : 'Triple Redundant IMU & Sensors',
+      type: 'Sensor',
+      voltage: '5.0 V',
+      current: '0.4 A',
+      status: 'Nominal',
+      x: 440,
+      y: 40,
+    },
+    {
+      id: 'rf_mesh',
+      name: isArabic ? 'هوائيات الربط اللاسلكي السيادية' : 'Sovereign RF Transceiver Array',
+      type: 'RF',
+      voltage: '12.0 V',
+      current: '3.2 A',
+      status: 'Nominal',
+      x: 620,
+      y: 80,
+    },
+    {
+      id: 'gimbal',
+      name: isArabic ? 'كاميرا الرصد الكهروضوئية EO/IR' : 'EO/IR 3-Axis Gimbal Pod',
+      type: 'Sensor',
+      voltage: '24.0 V',
+      current: '1.4 A',
+      status: 'Nominal',
+      x: 620,
+      y: 240,
+    },
+    {
+      id: 'vtol_esc_1',
+      name: isArabic ? 'متحكم ومحرك الإقلاع العمودي 1' : 'VTOL ESC & Motor 1 (Fwd Port)',
+      type: 'Actuator',
+      voltage: '50.4 V',
+      current: '14.2 A',
+      status: 'Nominal',
+      x: 260,
+      y: 320,
+    },
+    {
+      id: 'pusher_esc',
+      name: isArabic ? 'محرك الدفع الأفقي Cruise Pusher' : 'Cruise Pusher ESC & Motor',
+      type: 'Actuator',
+      voltage: '50.4 V',
+      current: '8.5 A',
+      status: 'Nominal',
+      x: 440,
+      y: 320,
+    },
   ];
 
   const nodes = initialNodes.map((n) => {
@@ -87,7 +159,7 @@ export const ConnectionSimulationView: React.FC = () => {
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#FF5964]/20 hover:bg-[#FF5964]/30 text-[#FF5964] border border-[#FF5964]/40 font-bold"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span>CLEAR HARDWARE FAULT</span>
+            <span>{isArabic ? 'إلغاء حَقْن العطل' : 'CLEAR HARDWARE FAULT'}</span>
           </button>
         )}
       </div>
@@ -97,10 +169,16 @@ export const ConnectionSimulationView: React.FC = () => {
         {/* Schematic SVG Diagram (2 Cols) */}
         <div className="lg:col-span-2 p-5 rounded-2xl bg-[#0D1623] border border-[#172638] space-y-4">
           <div className="flex items-center justify-between pb-2 border-b border-[#172638]">
-            <span className="font-bold text-[#EDF4FA]">INTERACTIVE AVIONICS BUS SCHEMATIC</span>
+            <span className="font-bold text-[#EDF4FA]">
+              {isArabic ? 'مخطط مسارات الطاقة وحافلة البيانات CAN' : 'INTERACTIVE AVIONICS BUS SCHEMATIC'}
+            </span>
             <div className="flex items-center gap-3 text-[10px]">
-              <span className="flex items-center gap-1"><span className="w-2.5 h-1 bg-[#F5B82E] inline-block" /> Power Bus</span>
-              <span className="flex items-center gap-1"><span className="w-2.5 h-1 bg-[#35D5E8] inline-block" /> CAN / Data Bus</span>
+              <span className="flex items-center gap-1">
+                <span className="w-2.5 h-1 bg-[#F5B82E] inline-block" /> {isArabic ? 'خط الطاقة (DC)' : 'Power Bus'}
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="w-2.5 h-1 bg-[#35D5E8] inline-block" /> {isArabic ? 'حافلة البيانات (CAN)' : 'CAN / Data Bus'}
+              </span>
             </div>
           </div>
 
@@ -149,7 +227,7 @@ export const ConnectionSimulationView: React.FC = () => {
                       fill={isFault ? '#FF5964' : isOffline ? '#64768B' : '#EDF4FA'}
                       fontSize="9"
                       fontWeight="bold"
-                      fontFamily="monospace"
+                      fontFamily="IBM Plex Sans Arabic, monospace"
                       textAnchor="middle"
                     >
                       {node.name.length > 20 ? node.name.substring(0, 18) + '...' : node.name}
@@ -161,7 +239,7 @@ export const ConnectionSimulationView: React.FC = () => {
                       fontFamily="monospace"
                       textAnchor="middle"
                     >
-                      {node.voltage} • {node.status}
+                      {node.voltage} • {isArabic ? (node.status === 'Nominal' ? 'سليم' : node.status === 'Fault' ? 'عطل' : 'متوقف') : node.status}
                     </text>
                   </g>
                 );
@@ -174,29 +252,33 @@ export const ConnectionSimulationView: React.FC = () => {
         <div className="p-5 rounded-2xl bg-[#0D1623] border border-[#172638] flex flex-col justify-between space-y-4">
           <div className="space-y-4">
             <div className="pb-2 border-b border-[#172638]">
-              <div className="text-[10px] text-[#35D5E8] font-bold">SELECTED AVIONICS UNIT</div>
+              <div className="text-[10px] text-[#35D5E8] font-bold">
+                {isArabic ? 'الوحدة الإلكترونية المحددة' : 'SELECTED AVIONICS UNIT'}
+              </div>
               <div className="text-base font-bold text-[#EDF4FA] font-sans">{selectedNode.name}</div>
               <div className="text-[10px] text-[#64768B]">ID: {selectedNode.id}</div>
             </div>
 
             {/* Electrical Parameters */}
             <div className="space-y-2">
-              <div className="text-[10px] text-[#64768B] uppercase font-bold">OPERATING SPECIFICATIONS</div>
+              <div className="text-[10px] text-[#64768B] uppercase font-bold">
+                {isArabic ? 'المواصفات التشغيلية الحالية' : 'OPERATING SPECIFICATIONS'}
+              </div>
               <div className="p-3 rounded-lg bg-[#111E2D] border border-[#172638] space-y-1.5 text-[11px]">
                 <div className="flex justify-between">
-                  <span className="text-[#92A4B8]">Subsystem Class:</span>
+                  <span className="text-[#92A4B8]">{isArabic ? 'فئة النظام الفرعي:' : 'Subsystem Class:'}</span>
                   <span className="text-[#EDF4FA] font-bold">{selectedNode.type}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#92A4B8]">Bus Voltage:</span>
+                  <span className="text-[#92A4B8]">{isArabic ? 'جهد التشغيل:' : 'Bus Voltage:'}</span>
                   <span className="text-[#35D5E8] font-bold">{selectedNode.voltage}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#92A4B8]">Current Load:</span>
+                  <span className="text-[#92A4B8]">{isArabic ? 'الحمل الحالي:' : 'Current Load:'}</span>
                   <span className="text-[#F5B82E] font-bold">{selectedNode.current}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#92A4B8]">Operating State:</span>
+                  <span className="text-[#92A4B8]">{isArabic ? 'الحالة التشغيلية:' : 'Operating State:'}</span>
                   <span
                     className={`font-bold ${
                       selectedNode.status === 'Nominal'
@@ -206,7 +288,9 @@ export const ConnectionSimulationView: React.FC = () => {
                         : 'text-[#64768B]'
                     }`}
                   >
-                    {selectedNode.status.toUpperCase()}
+                    {isArabic
+                      ? (selectedNode.status === 'Nominal' ? 'سليم (اسمِي)' : selectedNode.status === 'Fault' ? 'عَطَل نشط' : 'غير متصل')
+                      : selectedNode.status.toUpperCase()}
                   </span>
                 </div>
               </div>
@@ -216,10 +300,12 @@ export const ConnectionSimulationView: React.FC = () => {
             <div className="p-3 rounded-lg bg-[#111E2D] border border-[#172638] space-y-2">
               <div className="text-[10px] text-[#FF5964] font-bold flex items-center gap-1.5">
                 <AlertTriangle className="w-3.5 h-3.5" />
-                <span>FAULT INJECTION SIMULATOR</span>
+                <span>{isArabic ? 'محاكي حقن الأعطال التجريبي' : 'FAULT INJECTION SIMULATOR'}</span>
               </div>
               <p className="text-[10px] text-[#92A4B8] font-sans">
-                Simulate sudden component failure or short circuit on this rail to evaluate cascade protection.
+                {isArabic
+                  ? 'محاكاة انهيار فجائي أو دارة قصر على هذا الخط لتقييم حماية العزل التدريجي للشبكة الكهربائية.'
+                  : 'Simulate sudden component failure or short circuit on this rail to evaluate cascade protection.'}
               </p>
               <button
                 onClick={() => handleToggleFault(selectedNode.id)}
@@ -229,7 +315,9 @@ export const ConnectionSimulationView: React.FC = () => {
                     : 'bg-[#FF5964]/20 hover:bg-[#FF5964]/30 text-[#FF5964] border border-[#FF5964]/40'
                 }`}
               >
-                {injectedFaultId === selectedNode.id ? 'RESTORE COMPONENT' : 'INJECT BUS FAULT'}
+                {injectedFaultId === selectedNode.id
+                  ? (isArabic ? 'استعادة الوحدة وتصفير العطل' : 'RESTORE COMPONENT')
+                  : (isArabic ? 'حقن عطل كهربائي في الوحدة' : 'INJECT BUS FAULT')}
               </button>
             </div>
           </div>

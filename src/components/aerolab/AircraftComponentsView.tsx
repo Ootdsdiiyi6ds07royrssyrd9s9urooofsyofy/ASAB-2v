@@ -65,16 +65,16 @@ export const AircraftComponentsView: React.FC = () => {
           <div className="p-2.5 rounded-lg bg-[#0D1623] border border-[#172638] flex items-center gap-2">
             <Weight className="w-4 h-4 text-[#35D5E8]" />
             <div>
-              <div className="text-[10px] text-[#64768B]">TOTAL MASS</div>
-              <div className="text-sm font-bold text-[#EDF4FA]">{totalMass.toFixed(1)} kg</div>
+              <div className="text-[10px] text-[#64768B]">{isArabic ? 'الكتلة الإجمالية' : 'TOTAL MASS'}</div>
+              <div className="text-sm font-bold text-[#EDF4FA]">{totalMass.toFixed(1)} {isArabic ? 'كغ' : 'kg'}</div>
             </div>
           </div>
 
           <div className="p-2.5 rounded-lg bg-[#0D1623] border border-[#172638] flex items-center gap-2">
             <Zap className="w-4 h-4 text-[#F5B82E]" />
             <div>
-              <div className="text-[10px] text-[#64768B]">PEAK POWER</div>
-              <div className="text-sm font-bold text-[#EDF4FA]">{totalPower} W</div>
+              <div className="text-[10px] text-[#64768B]">{isArabic ? 'استهلاك الطاقة الأقصى' : 'PEAK POWER'}</div>
+              <div className="text-sm font-bold text-[#EDF4FA]">{totalPower} {isArabic ? 'واط' : 'W'}</div>
             </div>
           </div>
         </div>
@@ -86,7 +86,7 @@ export const AircraftComponentsView: React.FC = () => {
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#64768B]" />
           <input
             type="text"
-            placeholder="Search subsystems by name, function, or spec..."
+            placeholder={isArabic ? 'ابحث عن المكون بالاسم أو الوظيفة أو الموقع...' : 'Search subsystems by name, function, or spec...'}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-9 pr-3 py-2 rounded-lg bg-[#0D1623] border border-[#172638] text-[#EDF4FA] placeholder-[#64768B] focus:outline-none focus:border-[#35D5E8]"
@@ -104,7 +104,11 @@ export const AircraftComponentsView: React.FC = () => {
                   : 'bg-[#0D1623] text-[#92A4B8] hover:text-[#EDF4FA] border border-[#172638]'
               }`}
             >
-              {cat === 'all' ? 'All Subsystems' : cat}
+              {cat === 'all'
+                ? (isArabic ? 'جميع الأنظمة' : 'All Subsystems')
+                : isArabic
+                ? (cat === 'Airframe' ? 'الهيكل الجوي' : cat === 'Propulsion' ? 'الدفع والمحركات' : cat === 'Avionics' ? 'إلكترونيات الطيران' : cat === 'Energy' ? 'الطاقة والبطاريات' : cat === 'Payload & Sensors' ? 'الحمولة والمستشعرات' : 'التحكم بالطيران')
+                : cat}
             </button>
           ))}
         </div>
@@ -127,8 +131,26 @@ export const AircraftComponentsView: React.FC = () => {
                   <div className="text-[10px] text-[#64768B]">{comp.location}</div>
                 </div>
 
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#3DDC97]/20 text-[#3DDC97]">
-                  {comp.status}
+                <span
+                  className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                    comp.status === 'Operational'
+                      ? 'bg-[#3DDC97]/20 text-[#3DDC97]'
+                      : comp.status === 'Standby'
+                      ? 'bg-[#5587FF]/20 text-[#5587FF]'
+                      : comp.status === 'Warning'
+                      ? 'bg-[#F5B82E]/20 text-[#F5B82E]'
+                      : 'bg-[#FF5964]/20 text-[#FF5964]'
+                  }`}
+                >
+                  {isArabic
+                    ? (comp.status === 'Operational'
+                        ? 'تشغيلي سليم'
+                        : comp.status === 'Standby'
+                        ? 'جاهزية احتياط'
+                        : comp.status === 'Warning'
+                        ? 'تنبيه مراقبة'
+                        : 'صيانة مطلوبة')
+                    : comp.status}
                 </span>
               </div>
 
@@ -139,12 +161,12 @@ export const AircraftComponentsView: React.FC = () => {
               {/* Specs Grid */}
               <div className="p-2.5 rounded-lg bg-[#111E2D] border border-[#172638] space-y-1 text-[11px]">
                 <div className="flex justify-between">
-                  <span className="text-[#92A4B8]">Mass:</span>
-                  <span className="text-[#EDF4FA] font-bold">{comp.massKg} kg</span>
+                  <span className="text-[#92A4B8]">{isArabic ? 'الكتلة:' : 'Mass:'}</span>
+                  <span className="text-[#EDF4FA] font-bold">{comp.massKg} {isArabic ? 'كغ' : 'kg'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#92A4B8]">Power Draw:</span>
-                  <span className="text-[#F5B82E] font-bold">{comp.powerDrawWatts} W</span>
+                  <span className="text-[#92A4B8]">{isArabic ? 'استهلاك الطاقة:' : 'Power Draw:'}</span>
+                  <span className="text-[#F5B82E] font-bold">{comp.powerDrawWatts} {isArabic ? 'واط' : 'W'}</span>
                 </div>
                 {Object.entries(comp.specs).slice(0, 2).map(([k, v]) => (
                   <div key={k} className="flex justify-between">
@@ -163,7 +185,7 @@ export const AircraftComponentsView: React.FC = () => {
               className="w-full py-1.5 rounded-lg bg-[#111E2D] hover:bg-[#5587FF] hover:text-[#EDF4FA] text-[#5587FF] border border-[#172638] text-[11px] font-bold flex items-center justify-center gap-1.5 transition-colors"
             >
               <ExternalLink className="w-3.5 h-3.5" />
-              <span>Inspect in 3D Studio</span>
+              <span>{isArabic ? 'معاينة في الاستوديو ثلاثي الأبعاد' : 'Inspect in 3D Studio'}</span>
             </button>
           </div>
         ))}

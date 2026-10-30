@@ -141,7 +141,11 @@ export const AircraftStudioView: React.FC = () => {
               className="px-4 py-1 rounded-t-lg bg-[#0D1623]/95 border-t border-x border-[#172638] text-[10px] font-mono text-[#92A4B8] hover:text-[#35D5E8] flex items-center gap-1 shadow-lg"
             >
               {dockCollapsed ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-              <span>{dockCollapsed ? 'EXPAND STUDIO CONTROLS (H)' : 'COLLAPSE DOCK'}</span>
+              <span>
+                {dockCollapsed
+                  ? isArabic ? 'فتح لوحة التحكم ثلاثية الأبعاد (H)' : 'EXPAND STUDIO CONTROLS (H)'
+                  : isArabic ? 'طي لوحة التحكم' : 'COLLAPSE DOCK'}
+              </span>
             </button>
           </div>
 
@@ -150,7 +154,7 @@ export const AircraftStudioView: React.FC = () => {
               {/* Exploded View Slider and Buttons */}
               <div className="flex items-center gap-3 w-full md:w-auto flex-1">
                 <span className="text-[10px] text-[#35D5E8] font-bold tracking-wider shrink-0 uppercase">
-                  {isArabic ? 'تفكيك الأجزاء (EXPLODE)' : 'EXPLODED VIEW'}
+                  {isArabic ? 'تفكيك الأجزاء' : 'EXPLODED VIEW'}
                 </span>
 
                 <input
@@ -173,31 +177,40 @@ export const AircraftStudioView: React.FC = () => {
                     onClick={() => setExplodeFactor(0)}
                     className="px-2.5 py-1 rounded bg-[#111E2D] hover:bg-[#172638] text-[10px] text-[#92A4B8] hover:text-[#EDF4FA] border border-[#172638] transition-colors"
                   >
-                    Assemble
+                    {isArabic ? 'تجميع' : 'Assemble'}
                   </button>
                   <button
                     onClick={() => setExplodeFactor(1)}
                     className="px-2.5 py-1 rounded bg-[#111E2D] hover:bg-[#172638] text-[10px] text-[#35D5E8] border border-[#172638] font-bold transition-colors"
                   >
-                    Explode
+                    {isArabic ? 'تفكيك' : 'Explode'}
                   </button>
                 </div>
               </div>
 
               {/* Camera Presets */}
               <div className="flex items-center gap-1 shrink-0 border-t md:border-t-0 md:border-l border-[#172638] pt-2 md:pt-0 md:pl-3">
-                <span className="text-[10px] text-[#64768B] mr-1 hidden xl:inline">CAMERA:</span>
-                {(['iso', 'front', 'side', 'top', 'bottom', 'reset'] as const).map((view) => (
+                <span className="text-[10px] text-[#64768B] mr-1 hidden xl:inline">
+                  {isArabic ? 'الكاميرا:' : 'CAMERA:'}
+                </span>
+                {[
+                  { id: 'iso', label: 'ISO', labelAr: 'منظور' },
+                  { id: 'front', label: 'FRONT', labelAr: 'أمامي' },
+                  { id: 'side', label: 'SIDE', labelAr: 'جانبي' },
+                  { id: 'top', label: 'TOP', labelAr: 'علوي' },
+                  { id: 'bottom', label: 'BOTTOM', labelAr: 'سفلي' },
+                  { id: 'reset', label: 'RESET', labelAr: 'إعادة' },
+                ].map((view) => (
                   <button
-                    key={view}
-                    onClick={() => setCameraPreset(view)}
+                    key={view.id}
+                    onClick={() => setCameraPreset(view.id as any)}
                     className={`px-2 py-1 rounded text-[10px] font-mono uppercase transition-colors ${
-                      cameraPreset === view
+                      cameraPreset === view.id
                         ? 'bg-[#35D5E8] text-[#080D16] font-bold'
                         : 'bg-[#111E2D] text-[#92A4B8] hover:text-[#EDF4FA] border border-[#172638]'
                     }`}
                   >
-                    {view}
+                    {isArabic ? view.labelAr : view.label}
                   </button>
                 ))}
               </div>
@@ -209,8 +222,8 @@ export const AircraftStudioView: React.FC = () => {
                   className={`p-1.5 rounded transition-colors ${
                     showGrid ? 'bg-[#35D5E8]/20 text-[#35D5E8]' : 'text-[#64768B]'
                   }`}
-                  title="Toggle Grid Floor"
-                  aria-label="Toggle Grid Floor"
+                  title={isArabic ? 'تبديل الشبكة الأرضية' : 'Toggle Grid Floor'}
+                  aria-label={isArabic ? 'تبديل الشبكة الأرضية' : 'Toggle Grid Floor'}
                 >
                   <Grid className="w-4 h-4" />
                 </button>
@@ -219,8 +232,8 @@ export const AircraftStudioView: React.FC = () => {
                   className={`p-1.5 rounded transition-colors ${
                     measurementMode ? 'bg-[#35D5E8]/20 text-[#35D5E8]' : 'text-[#64768B]'
                   }`}
-                  title="Toggle Dimensions & Measurement Mode"
-                  aria-label="Toggle Dimensions & Measurement Mode"
+                  title={isArabic ? 'تبديل أبعاد القياس' : 'Toggle Dimensions & Measurement Mode'}
+                  aria-label={isArabic ? 'تبديل أبعاد القياس' : 'Toggle Dimensions & Measurement Mode'}
                 >
                   <Ruler className="w-4 h-4" />
                 </button>
@@ -229,8 +242,8 @@ export const AircraftStudioView: React.FC = () => {
                   className={`p-1.5 rounded transition-colors ${
                     showWireframe ? 'bg-[#35D5E8]/20 text-[#35D5E8]' : 'text-[#64768B]'
                   }`}
-                  title="Toggle Wireframe CAD Mode"
-                  aria-label="Toggle Wireframe CAD Mode"
+                  title={isArabic ? 'تبديل العرض السلكي CAD' : 'Toggle Wireframe CAD Mode'}
+                  aria-label={isArabic ? 'تبديل العرض السلكي CAD' : 'Toggle Wireframe CAD Mode'}
                 >
                   <Box className="w-4 h-4" />
                 </button>
@@ -239,9 +252,11 @@ export const AircraftStudioView: React.FC = () => {
                   className={`px-2 py-1 rounded text-[10px] transition-colors ${
                     isolatedMode ? 'bg-[#35D5E8] text-[#080D16] font-bold' : 'text-[#92A4B8] border border-[#172638]'
                   }`}
-                  title="Isolate Selected Component"
+                  title={isArabic ? 'عزل المكون المختار' : 'Isolate Selected Component'}
                 >
-                  {isolatedMode ? 'ISOLATED' : 'ISOLATE'}
+                  {isolatedMode
+                    ? isArabic ? 'معزول' : 'ISOLATED'
+                    : isArabic ? 'عزل' : 'ISOLATE'}
                 </button>
               </div>
             </div>
@@ -266,14 +281,18 @@ export const AircraftStudioView: React.FC = () => {
 
             {/* Description & Function */}
             <div className="space-y-2">
-              <div className="text-[10px] text-[#64768B] uppercase font-bold">DESCRIPTION</div>
+              <div className="text-[10px] text-[#64768B] uppercase font-bold">
+                {isArabic ? 'الوصف الهندسي' : 'DESCRIPTION'}
+              </div>
               <p className="text-[11px] text-[#92A4B8] font-sans leading-relaxed">
                 {selectedComponent.description}
               </p>
             </div>
 
             <div className="space-y-2">
-              <div className="text-[10px] text-[#64768B] uppercase font-bold">PRIMARY FUNCTION</div>
+              <div className="text-[10px] text-[#64768B] uppercase font-bold">
+                {isArabic ? 'الوظيفة الأساسية' : 'PRIMARY FUNCTION'}
+              </div>
               <p className="text-[11px] text-[#EDF4FA] font-sans leading-relaxed p-2.5 rounded-lg bg-[#111E2D] border border-[#172638]">
                 {selectedComponent.functionDesc}
               </p>
@@ -284,23 +303,25 @@ export const AircraftStudioView: React.FC = () => {
               <div className="p-2.5 rounded-lg bg-[#111E2D] border border-[#172638] flex items-center gap-2">
                 <Weight className="w-4 h-4 text-[#35D5E8]" />
                 <div>
-                  <div className="text-[10px] text-[#64768B]">MASS</div>
-                  <div className="font-bold text-[#EDF4FA]">{selectedComponent.massKg} kg</div>
+                  <div className="text-[10px] text-[#64768B]">{isArabic ? 'الكتلة' : 'MASS'}</div>
+                  <div className="font-bold text-[#EDF4FA]">{selectedComponent.massKg} {isArabic ? 'كجم' : 'kg'}</div>
                 </div>
               </div>
 
               <div className="p-2.5 rounded-lg bg-[#111E2D] border border-[#172638] flex items-center gap-2">
                 <Zap className="w-4 h-4 text-[#F5B82E]" />
                 <div>
-                  <div className="text-[10px] text-[#64768B]">POWER</div>
-                  <div className="font-bold text-[#EDF4FA]">{selectedComponent.powerDrawWatts} W</div>
+                  <div className="text-[10px] text-[#64768B]">{isArabic ? 'استهلاك الطاقة' : 'POWER'}</div>
+                  <div className="font-bold text-[#EDF4FA]">{selectedComponent.powerDrawWatts} {isArabic ? 'واط' : 'W'}</div>
                 </div>
               </div>
             </div>
 
             {/* Technical Specifications Key-Values */}
             <div className="space-y-2">
-              <div className="text-[10px] text-[#64768B] uppercase font-bold">ENGINEERING PARAMETERS</div>
+              <div className="text-[10px] text-[#64768B] uppercase font-bold">
+                {isArabic ? 'المواصفات الفنية' : 'ENGINEERING PARAMETERS'}
+              </div>
               <div className="p-2.5 rounded-lg bg-[#111E2D] border border-[#172638] space-y-1.5 text-[11px]">
                 {Object.entries(selectedComponent.specs).map(([k, v]) => (
                   <div key={k} className="flex justify-between">
@@ -318,7 +339,9 @@ export const AircraftStudioView: React.FC = () => {
               onClick={() => setIsolatedMode(!isolatedMode)}
               className="w-full py-2 rounded-lg bg-[#111E2D] hover:bg-[#172638] border border-[#172638] text-[#EDF4FA] text-xs font-bold transition-colors"
             >
-              {isolatedMode ? 'SHOW ALL COMPONENTS' : 'ISOLATE THIS COMPONENT'}
+              {isolatedMode
+                ? isArabic ? 'عرض كافة المكونات' : 'SHOW ALL COMPONENTS'
+                : isArabic ? 'عزل هذا المكون فقط' : 'ISOLATE THIS COMPONENT'}
             </button>
           </div>
         </aside>

@@ -60,7 +60,7 @@ export const SimulationReportsView: React.FC = () => {
           className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#35D5E8] hover:bg-[#28c5d8] text-[#080D16] font-bold transition-colors"
         >
           <Plus className="w-4 h-4" />
-          <span>GENERATE NEW REPORT</span>
+          <span>{isArabic ? 'إنشاء تقرير فني جديد' : 'GENERATE NEW REPORT'}</span>
         </button>
       </div>
 
@@ -69,7 +69,7 @@ export const SimulationReportsView: React.FC = () => {
         {/* Left Reports List */}
         <div className="p-4 rounded-2xl bg-[#0D1623] border border-[#172638] space-y-3">
           <div className="text-xs font-bold text-[#EDF4FA] pb-2 border-b border-[#172638]">
-            ARCHIVED REPORTS ({reports.length})
+            {isArabic ? `الأرشيف المعتمد (${reports.length} تقرير)` : `ARCHIVED REPORTS (${reports.length})`}
           </div>
 
           <div className="space-y-2">
@@ -96,12 +96,12 @@ export const SimulationReportsView: React.FC = () => {
                           : 'bg-[#FF5964]/20 text-[#FF5964]'
                       }`}
                     >
-                      {rep.status}
+                      {isArabic ? (rep.status === 'Success' ? 'ناجح' : rep.status === 'Degraded Pass' ? 'مقبول مع انخفاض' : 'فشل') : rep.status}
                     </span>
                   </div>
                   <div className="text-[10px] text-[#64768B] flex items-center justify-between">
                     <span>{rep.date}</span>
-                    <span>{rep.aircraftCount} Aircraft</span>
+                    <span>{rep.aircraftCount} {isArabic ? 'طائرات' : 'Aircraft'}</span>
                   </div>
                 </div>
               );
@@ -114,9 +114,13 @@ export const SimulationReportsView: React.FC = () => {
           <div className="lg:col-span-2 p-6 rounded-2xl bg-[#0D1623] border border-[#172638] space-y-5">
             <div className="flex items-start justify-between pb-4 border-b border-[#172638]">
               <div>
-                <div className="text-[10px] text-[#35D5E8] font-bold uppercase">OFFICIAL SIMULATION AUDIT REPORT</div>
+                <div className="text-[10px] text-[#35D5E8] font-bold uppercase">
+                  {isArabic ? 'تقرير التحقق والتدقيق العملياتي الرسمي' : 'OFFICIAL SIMULATION AUDIT REPORT'}
+                </div>
                 <h2 className="text-lg font-bold text-[#EDF4FA] font-sans mt-0.5">{selectedReport.scenarioName}</h2>
-                <div className="text-[11px] text-[#92A4B8]">Report ID: {selectedReport.id} • {selectedReport.date}</div>
+                <div className="text-[11px] text-[#92A4B8]">
+                  {isArabic ? 'معرف التقرير' : 'Report ID'}: {selectedReport.id} • {selectedReport.date}
+                </div>
               </div>
 
               <button
@@ -124,33 +128,35 @@ export const SimulationReportsView: React.FC = () => {
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#111E2D] hover:bg-[#172638] border border-[#172638] text-[#EDF4FA] transition-colors"
               >
                 <Download className="w-3.5 h-3.5 text-[#35D5E8]" />
-                <span>EXPORT CSV</span>
+                <span>{isArabic ? 'تصدير CSV' : 'EXPORT CSV'}</span>
               </button>
             </div>
 
             {/* Metrics KPI Bar */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div className="p-3 rounded-xl bg-[#111E2D] border border-[#172638]">
-                <div className="text-[10px] text-[#92A4B8]">PACKET DELIVERY</div>
+                <div className="text-[10px] text-[#92A4B8]">{isArabic ? 'تسليم الحزم' : 'PACKET DELIVERY'}</div>
                 <div className="text-xl font-bold text-[#35D5E8]">{selectedReport.packetDeliveryRatio}%</div>
               </div>
               <div className="p-3 rounded-xl bg-[#111E2D] border border-[#172638]">
-                <div className="text-[10px] text-[#92A4B8]">AVG LATENCY</div>
-                <div className="text-xl font-bold text-[#EDF4FA]">{selectedReport.averageLatencyMs} ms</div>
+                <div className="text-[10px] text-[#92A4B8]">{isArabic ? 'متوسط الكمون' : 'AVG LATENCY'}</div>
+                <div className="text-xl font-bold text-[#EDF4FA]">{selectedReport.averageLatencyMs} {isArabic ? 'مللي ثانية' : 'ms'}</div>
               </div>
               <div className="p-3 rounded-xl bg-[#111E2D] border border-[#172638]">
-                <div className="text-[10px] text-[#92A4B8]">THROUGHPUT</div>
-                <div className="text-xl font-bold text-[#5587FF]">{selectedReport.throughputMbps} Mbps</div>
+                <div className="text-[10px] text-[#92A4B8]">{isArabic ? 'معدل النقل' : 'THROUGHPUT'}</div>
+                <div className="text-xl font-bold text-[#5587FF]">{selectedReport.throughputMbps} {isArabic ? 'ميجابت/ث' : 'Mbps'}</div>
               </div>
               <div className="p-3 rounded-xl bg-[#111E2D] border border-[#172638]">
-                <div className="text-[10px] text-[#92A4B8]">FLEET SIZE</div>
-                <div className="text-xl font-bold text-[#3DDC97]">{selectedReport.aircraftCount} Units</div>
+                <div className="text-[10px] text-[#92A4B8]">{isArabic ? 'حجم الأسطول' : 'FLEET SIZE'}</div>
+                <div className="text-xl font-bold text-[#3DDC97]">{selectedReport.aircraftCount} {isArabic ? 'طائرات' : 'Units'}</div>
               </div>
             </div>
 
             {/* Observations */}
             <div className="space-y-2">
-              <div className="text-[10px] text-[#64768B] uppercase font-bold">OPERATIONAL OBSERVATIONS</div>
+              <div className="text-[10px] text-[#64768B] uppercase font-bold">
+                {isArabic ? 'الملاحظات والنتائج الفنية والعملياتية' : 'OPERATIONAL OBSERVATIONS'}
+              </div>
               <div className="space-y-1.5">
                 {selectedReport.observations.map((obs, i) => (
                   <div key={i} className="p-2.5 rounded-lg bg-[#111E2D] border border-[#172638] flex items-start gap-2 text-[11px] text-[#EDF4FA] font-sans">
@@ -164,7 +170,9 @@ export const SimulationReportsView: React.FC = () => {
             {/* Warnings */}
             {selectedReport.warnings.length > 0 && (
               <div className="space-y-2">
-                <div className="text-[10px] text-[#FF5964] uppercase font-bold">SYSTEM WARNINGS & ANOMALIES</div>
+                <div className="text-[10px] text-[#FF5964] uppercase font-bold">
+                  {isArabic ? 'تحذيرات النظام وملاحظات الشذوذ' : 'SYSTEM WARNINGS & ANOMALIES'}
+                </div>
                 <div className="space-y-1.5">
                   {selectedReport.warnings.map((warn, i) => (
                     <div key={i} className="p-2.5 rounded-lg bg-[#FF5964]/10 border border-[#FF5964]/30 flex items-start gap-2 text-[11px] text-[#FF5964] font-sans">

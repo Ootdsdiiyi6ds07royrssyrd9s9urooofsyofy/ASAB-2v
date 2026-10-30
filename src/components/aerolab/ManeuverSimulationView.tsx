@@ -21,14 +21,23 @@ export const ManeuverSimulationView: React.FC = () => {
 
   const isArabic = settings.language === 'ar';
 
-  const maneuvers = [
-    'Straight Flight',
-    'Gradual Turns',
-    'Banking',
-    'Altitude Adjustment',
-    'Obstacle Awareness',
-    'Safe Route Navigation',
-  ];
+  const maneuvers = isArabic
+    ? [
+        { id: 'Straight Flight', name: 'طيران خطي مباشر' },
+        { id: 'Gradual Turns', name: 'انعطافات تدريجية ناعمة' },
+        { id: 'Banking', name: 'ميلان جانبي حاد (Banking)' },
+        { id: 'Altitude Adjustment', name: 'مناورة التدرج بالارتفاع' },
+        { id: 'Obstacle Awareness', name: 'تفادي العوائق والتضاريس' },
+        { id: 'Safe Route Navigation', name: 'ملاحة المسار الآمن المشفر' },
+      ]
+    : [
+        { id: 'Straight Flight', name: 'Straight Flight' },
+        { id: 'Gradual Turns', name: 'Gradual Turns' },
+        { id: 'Banking', name: 'Banking' },
+        { id: 'Altitude Adjustment', name: 'Altitude Adjustment' },
+        { id: 'Obstacle Awareness', name: 'Obstacle Awareness' },
+        { id: 'Safe Route Navigation', name: 'Safe Route Navigation' },
+      ];
 
   return (
     <div className="h-[calc(100vh-3.5rem)] flex flex-col bg-[#080D16] font-mono text-xs select-none overflow-hidden relative">
@@ -41,14 +50,14 @@ export const ManeuverSimulationView: React.FC = () => {
           </div>
 
           <div className="hidden sm:flex items-center gap-1.5 text-[11px]">
-            <span className="text-[#92A4B8]">SELECT MANEUVER:</span>
+            <span className="text-[#92A4B8]">{isArabic ? 'نوع المناورة:' : 'SELECT MANEUVER:'}</span>
             <select
               value={selectedManeuver}
               onChange={(e) => setSelectedManeuver(e.target.value)}
               className="p-1 rounded bg-[#111E2D] border border-[#172638] text-[#35D5E8] font-bold focus:outline-none"
             >
               {maneuvers.map((m) => (
-                <option key={m} value={m}>{m}</option>
+                <option key={m.id} value={m.id}>{m.name}</option>
               ))}
             </select>
           </div>
