@@ -40,10 +40,22 @@ export const AppHeader: React.FC = () => {
   };
 
   const toggleFullscreen = () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
-    } else {
-      document.exitFullscreen().catch(() => {});
+    try {
+      const doc = document as any;
+      const elem = document.documentElement as any;
+      if (!doc.fullscreenElement && !doc.webkitFullscreenElement && !doc.mozFullScreenElement) {
+        const requestFS = elem.requestFullscreen || elem.webkitRequestFullscreen || elem.mozRequestFullScreen || elem.msRequestFullscreen;
+        if (requestFS) {
+          requestFS.call(elem).catch(() => {});
+        }
+      } else {
+        const exitFS = doc.exitFullscreen || doc.webkitExitFullscreen || doc.mozCancelFullScreen || doc.msExitFullscreen;
+        if (exitFS) {
+          exitFS.call(doc).catch(() => {});
+        }
+      }
+    } catch {
+      // Ignore
     }
   };
 

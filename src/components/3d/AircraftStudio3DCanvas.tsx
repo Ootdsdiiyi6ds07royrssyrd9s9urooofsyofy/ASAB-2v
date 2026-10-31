@@ -300,6 +300,7 @@ export const AircraftStudio3DCanvas: React.FC<AircraftStudioProps> = ({
       mouse.y = -((evt.clientY - rect.top) / rect.height) * 2 + 1;
 
       raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(aircraft.rootGroup.children, true);
       if (intersects.length > 0) {
         let topObj: THREE.Object3D | null = intersects[0].object;
         while (topObj && !topObj.userData?.componentId && topObj !== aircraft.rootGroup) {

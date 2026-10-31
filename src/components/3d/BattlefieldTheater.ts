@@ -195,55 +195,84 @@ export function buildBattlefieldTheater(initialMode: BattlefieldEnvironmentMode 
   const rootGroup = new THREE.Group();
   rootGroup.name = 'BattlefieldTheaterRoot';
 
-  // 1. Procedural Topographical Combat Terrain with Heightmap
-  const terrainWidth = 160;
-  const terrainDepth = 160;
-  const segments = 90;
+  // 1. Procedural Topographical Combat Terrain with Heightmap (Mountains, Valleys, Strategic Roads & FOB)
+  const terrainWidth = 180;
+  const terrainDepth = 180;
+  const segments = 110;
   const terrainGeo = new THREE.PlaneGeometry(terrainWidth, terrainDepth, segments, segments);
   terrainGeo.rotateX(-Math.PI / 2);
 
-  // Displace vertices to create tactical dunes, hills, blast craters, and trenches
+  // Displace vertices to create majestic mountain ridges (جبال), tactical valleys (وديان), strategic roads, and blast craters
   const posAttr = terrainGeo.attributes.position;
   for (let i = 0; i < posAttr.count; i++) {
     const x = posAttr.getX(i);
     const z = posAttr.getZ(i);
 
-    // Keep center FOB area flat for runway/helipad landing
+    // Keep central FOB landing apron flat
     const distFromCenter = Math.sqrt(x * x + z * z);
-    if (distFromCenter < 14) {
-      posAttr.setY(i, 0);
+    if (distFromCenter < 16) {
+      posAttr.setY(i, 0.1);
       continue;
     }
 
-    // Blend outer hills & dunes
-    const blend = Math.min(1, (distFromCenter - 14) / 25);
+    // Blend outer terrain
+    const blend = Math.min(1, (distFromCenter - 16) / 24);
 
-    // Compound sin/cos heightmap for natural desert terrain ridges
+    // Base rolling desert terrain & dunes
     let elevation =
-      Math.sin(x * 0.045) * Math.cos(z * 0.045) * 3.8 +
-      Math.sin(x * 0.09 + z * 0.07) * 2.1 +
-      Math.cos(x * 0.15 - z * 0.12) * 1.1;
+      Math.sin(x * 0.038) * Math.cos(z * 0.038) * 4.2 +
+      Math.sin(x * 0.08 + z * 0.06) * 2.5 +
+      Math.cos(x * 0.14 - z * 0.11) * 1.2;
+
+    // 1. Majestic Mountain Ranges (جبال) along Northern and Western Periphery
+    const northernMountainDist = Math.abs(z + 65);
+    const westernMountainDist = Math.abs(x + 65);
+    if (z < -35) {
+      const ridgeFactor = Math.max(0, 1 - (northernMountainDist / 35));
+      const jaggedPeaks = Math.abs(Math.sin(x * 0.12) * Math.cos(z * 0.12)) * 18.0 + ridgeFactor * 14.0;
+      elevation += jaggedPeaks;
+    }
+    if (x < -45) {
+      const ridgeFactor = Math.max(0, 1 - (westernMountainDist / 35));
+      const westernPeaks = Math.abs(Math.cos(x * 0.1) * Math.sin(z * 0.09)) * 16.0 + ridgeFactor * 12.0;
+      elevation += westernPeaks;
+    }
+
+    // 2. Carved Tactical Valleys (وديان) between ridges
+    const valleyCurve = Math.sin(x * 0.05) * 12;
+    const valleyDist = Math.abs((z - 15) - valleyCurve);
+    if (valleyDist < 10 && z < 20 && z > -25) {
+      const valleyDepth = (1 - valleyDist / 10) * 5.5;
+      elevation -= valleyDepth;
+    }
+
+    // 3. Strategic Logistics Roads (طرق استراتيجية) - Flattened paths for supply trucks & armor
+    const road1Dist = Math.abs(x - (z * 0.6)); // Road from FOB to North
+    const road2Dist = Math.abs(z + (x * 0.4) + 10); // Road across sector
+    if (road1Dist < 3.2 || road2Dist < 3.2) {
+      elevation = elevation * 0.25; // Flatten into supply roadway
+    }
 
     // Bomb blast crater depressions
     const crater1Dist = Math.hypot(x - 35, z + 40);
     if (crater1Dist < 12) {
-      elevation -= Math.cos((crater1Dist / 12) * (Math.PI / 2)) * 3.2;
+      elevation -= Math.cos((crater1Dist / 12) * (Math.PI / 2)) * 3.5;
     }
     const crater2Dist = Math.hypot(x + 45, z - 30);
     if (crater2Dist < 14) {
-      elevation -= Math.cos((crater2Dist / 14) * (Math.PI / 2)) * 3.8;
+      elevation -= Math.cos((crater2Dist / 14) * (Math.PI / 2)) * 4.0;
     }
 
     // Defensive frontline trench zig-zag cut
-    if (z > 35 && z < 42 && Math.abs(x) < 55) {
-      const trenchCenter = 38 + Math.sin(x * 0.25) * 2.0;
+    if (z > 40 && z < 48 && Math.abs(x) < 60) {
+      const trenchCenter = 44 + Math.sin(x * 0.22) * 2.5;
       const trenchDist = Math.abs(z - trenchCenter);
-      if (trenchDist < 2.5) {
-        elevation -= (1 - trenchDist / 2.5) * 2.2;
+      if (trenchDist < 2.8) {
+        elevation -= (1 - trenchDist / 2.8) * 2.5;
       }
     }
 
-    posAttr.setY(i, elevation * blend);
+    posAttr.setY(i, elevation);
   }
   terrainGeo.computeVertexNormals();
 
@@ -467,6 +496,48 @@ export function buildBattlefieldTheater(initialMode: BattlefieldEnvironmentMode 
     fobGroup.add(ptLight);
     runwayLights.push(ptLight);
   }
+
+  // Armored Combat Vehicles (Tanks & APCs) across the battlefield
+  const armoredGroup = new THREE.Group();
+  armoredGroup.name = 'ArmoredVehicles';
+
+  const hullMat = new THREE.MeshStandardMaterial({ color: 0x364132, roughness: 0.7, metalness: 0.3 });
+  const trackMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.9, metalness: 0.5 });
+  const gunMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.4, metalness: 0.8 });
+
+  function createTank(x: number, z: number, rotation: number) {
+    const tankGroup = new THREE.Group();
+    tankGroup.position.set(x, 0, z);
+    tankGroup.rotation.y = rotation;
+
+    const hull = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.9, 4.2), hullMat);
+    hull.position.y = 0.45;
+    hull.castShadow = true;
+    tankGroup.add(hull);
+
+    const turret = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.7, 2.0), hullMat);
+    turret.position.set(0, 1.15, 0.2);
+    turret.castShadow = true;
+    tankGroup.add(turret);
+
+    const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 3.2, 12), gunMat);
+    barrel.rotateX(Math.PI / 2);
+    barrel.position.set(0, 1.3, 1.8);
+    tankGroup.add(barrel);
+
+    for (const sx of [-1.3, 1.3]) {
+      const track = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.75, 4.4), trackMat);
+      track.position.set(sx, 0.35, 0);
+      tankGroup.add(track);
+    }
+    return tankGroup;
+  }
+
+  armoredGroup.add(createTank(-24, 20, 0.6));
+  armoredGroup.add(createTank(26, -28, -1.1));
+  armoredGroup.add(createTank(35, 22, 2.2));
+  armoredGroup.add(createTank(-32, -18, 1.5));
+  fobGroup.add(armoredGroup);
 
   rootGroup.add(fobGroup);
 

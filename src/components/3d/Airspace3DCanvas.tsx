@@ -100,11 +100,23 @@ export const Airspace3DCanvas: React.FC<Airspace3DProps> = ({ viewMode = '3d' })
     dirLight.position.set(20, 40, 20);
     scene.add(dirLight);
 
-    // Tactical Airspace Ground Grid
-    const grid = new THREE.GridHelper(80, 40, 0x35d5e8, 0x112233);
+    // Tactical Airspace Ground Grid - Battlefield Terrain
+    const groundGeo = new THREE.PlaneGeometry(100, 100);
+    const groundMat = new THREE.MeshStandardMaterial({
+      color: 0x111e2d,
+      roughness: 0.8,
+      side: THREE.DoubleSide,
+    });
+    const groundMesh = new THREE.Mesh(groundGeo, groundMat);
+    groundMesh.rotation.x = Math.PI / 2;
+    groundMesh.position.y = -0.05;
+    scene.add(groundMesh);
+
+    // Grid Overlay
+    const grid = new THREE.GridHelper(100, 50, 0x35d5e8, 0x112233);
     grid.position.y = 0;
     (grid.material as THREE.Material).transparent = true;
-    (grid.material as THREE.Material).opacity = 0.35;
+    (grid.material as THREE.Material).opacity = 0.2;
     scene.add(grid);
 
     // Radar concentric range rings on ground

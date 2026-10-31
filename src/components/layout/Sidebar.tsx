@@ -77,7 +77,7 @@ export const Sidebar: React.FC = () => {
     <aside
       className={`h-[calc(100vh-3.5rem)] bg-[#0D1623] border-r border-[#172638] transition-all duration-200 flex flex-col justify-between shrink-0 select-none z-10 ${
         collapsed ? 'w-14' : 'w-64'
-      }`}
+      } fixed md:relative left-0 top-14 md:top-0`}
     >
       {/* Scrollable Navigation List */}
       <div className="flex-1 overflow-y-auto p-2 space-y-4">
