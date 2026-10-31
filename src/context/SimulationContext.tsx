@@ -43,23 +43,24 @@ interface SimulationContextType {
   selectedNodeId: string | null;
   selectedComponentId: string | null;
   explodeFactor: number;
-  cameraPreset: 'front' | 'side' | 'top' | 'bottom' | 'iso' | 'reset';
+  cameraPreset: 'front' | 'side' | 'top' | 'bottom' | 'iso' | 'reset' | 'hero' | 'rear' | 'detail';
   activeScenarioId: string | null;
   scenarioRunning: boolean;
   scenarioProgressPercent: number;
   simulationClockSeconds: number;
   metrics: ReturnType<typeof computeNetworkHealthMetrics>;
+  mobileSidebarOpen: boolean;
 
   // Actions
   selectNode: (id: string | null) => void;
   selectComponent: (id: string | null) => void;
   setExplodeFactor: (factor: number) => void;
-  setCameraPreset: (preset: 'front' | 'side' | 'top' | 'bottom' | 'iso' | 'reset') => void;
+  setCameraPreset: (preset: 'front' | 'side' | 'top' | 'bottom' | 'iso' | 'reset' | 'hero' | 'rear' | 'detail') => void;
   addNode: (nodeData?: Partial<AircraftNode>) => void;
   removeNode: (id: string) => void;
   updateNodeStatus: (id: string, status: NodeStatus) => void;
   updateNodePosition: (id: string, pos: { x: number; y: number; z: number }) => void;
-  runScenario: (scenarioId: string) => void;
+  runScenario: (scenario: string | ResilienceScenario) => void;
   pauseSimulation: () => void;
   resumeSimulation: () => void;
   resetSimulation: () => void;
@@ -70,6 +71,7 @@ interface SimulationContextType {
   removePlatform: (id: string) => void;
   togglePlatformStatus: (id: string) => void;
   navigateToModule: (moduleId: string, env?: 'asab' | 'aerolab') => void;
+  setMobileSidebarOpen: (open: boolean) => void;
 }
 
 const SimulationContext = createContext<SimulationContextType | null>(null);
@@ -87,42 +89,49 @@ export const SimulationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>('NODE-01');
   const [selectedComponentId, setSelectedComponentId] = useState<string | null>('comp_fuselage_main');
   const [explodeFactor, setExplodeFactor] = useState<number>(0);
-  const [cameraPreset, setCameraPreset] = useState<'front' | 'side' | 'top' | 'bottom' | 'iso' | 'reset'>('iso');
+  const [cameraPreset, setCameraPreset] = useState<'front' | 'side' | 'top' | 'bottom' | 'iso' | 'reset' | 'hero' | 'rear' | 'detail'>('iso');
 
   // Scenario execution state
   const [activeScenarioId, setActiveScenarioId] = useState<string | null>('scen_01');
   const [scenarioRunning, setScenarioRunning] = useState<boolean>(true);
   const [scenarioProgressPercent, setScenarioProgressPercent] = useState<number>(15);
   const [simulationClockSeconds, setSimulationClockSeconds] = useState<number>(120);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState<boolean>(false);
 
   // Settings
+  const isPhone = typeof window !== 'undefined' && window.innerWidth < 768;
+  const DEFAULT_SETTINGS: SystemSettings = {
+    language: 'ar',
+    quality: isPhone ? 'medium' : 'high',
+    audioEnabled: true,
+    simulationSpeed: 1,
+    units: 'metric',
+    showNetworkLayer: true,
+    showCoverageLayer: true,
+    showLabels: true,
+    activeEnvironment: 'asab',
+    activeModuleId: 'command-center',
+  };
   const [settings, setSettings] = useState<SystemSettings>(() => {
-    const saved = localStorage.getItem('asab_settings');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        return { ...parsed, language: 'ar' };
-      } catch (e) {
-        // ignore parse error
+    try {
+      const saved = localStorage.getItem('asab_settings');
+      if (saved) {
+        // Merge with defaults so newly added fields never end up undefined; keep the user's saved language.
+        return { ...DEFAULT_SETTINGS, ...JSON.parse(saved) };
       }
+    } catch (e) {
+      // storage unavailable or corrupt: fall back to defaults
     }
-    return {
-      language: 'ar',
-      quality: 'high',
-      audioEnabled: true,
-      simulationSpeed: 1,
-      units: 'metric',
-      showNetworkLayer: true,
-      showCoverageLayer: true,
-      showLabels: true,
-      activeEnvironment: 'asab',
-      activeModuleId: 'command-center',
-    };
+    return DEFAULT_SETTINGS;
   });
 
   // Save settings on update
   useEffect(() => {
-    localStorage.setItem('asab_settings', JSON.stringify(settings));
+    try {
+      localStorage.setItem('asab_settings', JSON.stringify(settings));
+    } catch (e) {
+      // ignore (private mode / quota)
+    }
     if (settings.language === 'ar') {
       document.documentElement.dir = 'rtl';
       document.documentElement.lang = 'ar';
@@ -263,9 +272,10 @@ export const SimulationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   // Scenario execution engine
   const runScenario = useCallback(
-    (scenarioId: string) => {
-      const scen = scenarios.find((s) => s.id === scenarioId);
+    (scenario: string | ResilienceScenario) => {
+      const scen = typeof scenario === 'string' ? scenarios.find((s) => s.id === scenario) : scenario;
       if (!scen) return;
+      const scenarioId = scen.id;
 
       setActiveScenarioId(scenarioId);
       setScenarioRunning(true);
@@ -441,6 +451,9 @@ export const SimulationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
             'interoperability',
             'resilience',
             'event-log',
+            'scenario-manager',
+            'settings',
+            'about-asab',
           ].includes(moduleId)
         ) {
           targetEnv = 'asab';
@@ -478,6 +491,7 @@ export const SimulationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     if (!scenarioRunning) return;
 
     const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return; // save battery when tab is hidden
       setSimulationClockSeconds((prev) => prev + 1);
 
       // Advance scenario progress
@@ -501,9 +515,9 @@ export const SimulationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
           // Turn slightly if too far from base (boundary patrol box)
           let nextHeading = node.telemetry.heading;
           if (Math.abs(nextX) > 24 || Math.abs(nextZ) > 24) {
-            nextHeading = (nextHeading + 180 + (Math.random() - 0.5) * 30) % 360;
+            nextHeading = (((nextHeading + 180 + (Math.random() - 0.5) * 30) % 360) + 360) % 360;
           } else if (Math.random() > 0.8) {
-            nextHeading = (nextHeading + (Math.random() - 0.5) * 4) % 360;
+            nextHeading = (((nextHeading + (Math.random() - 0.5) * 4) % 360) + 360) % 360;
           }
 
           // Subtle battery consumption
@@ -512,9 +526,9 @@ export const SimulationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
           return {
             ...node,
             position: {
-              x: Number(nextX.toFixed(2)),
+              x: Number(nextX.toFixed(4)),
               y: node.position.y,
-              z: Number(nextZ.toFixed(2)),
+              z: Number(nextZ.toFixed(4)),
             },
             telemetry: {
               ...node.telemetry,
@@ -553,6 +567,7 @@ export const SimulationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         scenarioProgressPercent,
         simulationClockSeconds,
         metrics,
+        mobileSidebarOpen,
 
         selectNode,
         selectComponent,
@@ -573,6 +588,7 @@ export const SimulationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         removePlatform,
         togglePlatformStatus,
         navigateToModule,
+        setMobileSidebarOpen,
       }}
     >
       {children}

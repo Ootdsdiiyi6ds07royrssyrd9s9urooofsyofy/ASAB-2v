@@ -10,7 +10,7 @@ import * as THREE from 'three';
 /**
  * Procedural 2x2 Twill Carbon Fiber Weave Texture
  */
-export function createCarbonFiberTexture(baseColor = '#141A23'): THREE.CanvasTexture {
+export function createCarbonFiberTexture(baseColor = '#201b17'): THREE.CanvasTexture {
   const size = 128;
   const canvas = document.createElement('canvas');
   canvas.width = size;
@@ -130,11 +130,11 @@ export function createAircraftMarkingsTexture(scheme: 'stealth' | 'sovereign' | 
   ctx.clearRect(0, 0, size, size);
 
   const accentColor =
-    scheme === 'sovereign' ? '#35D5E8' :
-    scheme === 'camo' ? '#E0BA68' :
-    scheme === 'test' ? '#FF7A00' : '#35D5E8';
+    scheme === 'sovereign' ? '#9a6a3a' :
+    scheme === 'camo' ? '#e0ba68' :
+    scheme === 'test' ? '#ff7a00' : '#9a6a3a';
 
-  const textColor = scheme === 'test' ? '#111827' : '#EDF4FA';
+  const textColor = scheme === 'test' ? '#221c16' : '#f6ecdd';
 
   // Sovereign Chevron / Roundel Emblem
   ctx.save();
@@ -189,15 +189,15 @@ export function createAircraftMarkingsTexture(scheme: 'stealth' | 'sovereign' | 
   ctx.direction = 'rtl';
 
   // Danger Jet exhaust
-  ctx.fillStyle = '#FF5964';
+  ctx.fillStyle = '#e8584a';
   ctx.fillText('⚠️ خطر: عادم نفاث ساخن / DANGER EXHAUST', 256, 340);
 
   // Caution Propeller
-  ctx.fillStyle = '#F5B82E';
+  ctx.fillStyle = '#f5b82e';
   ctx.fillText('⚠️ تحذير: منطقة دوران مراوح الرفع VTOL', 256, 375);
 
   // Hoist & Grounding
-  ctx.fillStyle = '#3DDC97';
+  ctx.fillStyle = '#8fc46a';
   ctx.fillText('⚓ نقطة رفع أرضية سيادية معتمدة [KSA-DEF-01]', 256, 410);
 
   // Hash/Border corner technical ticks
@@ -231,16 +231,16 @@ export function createOpticalGlassTexture(): THREE.CanvasTexture {
   const ctx = canvas.getContext('2d')!;
 
   const gradient = ctx.createRadialGradient(64, 64, 5, 64, 64, 60);
-  gradient.addColorStop(0, 'rgba(85, 135, 255, 0.85)');   // Optical core
-  gradient.addColorStop(0.4, 'rgba(53, 213, 232, 0.7)');   // Dichroic cyan
-  gradient.addColorStop(0.75, 'rgba(168, 85, 247, 0.6)');  // Magenta flare
-  gradient.addColorStop(1, 'rgba(17, 30, 45, 0.95)');      // Rim bezel
+  gradient.addColorStop(0, 'rgba(181, 121, 63, 0.85)');   // Optical core
+  gradient.addColorStop(0.4, 'rgba(216, 185, 138, 0.7)');   // Dichroic cyan
+  gradient.addColorStop(0.75, 'rgba(224, 160, 110, 0.6)');  // Magenta flare
+  gradient.addColorStop(1, 'rgba(35, 26, 18, 0.95)');      // Rim bezel
 
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, size, size);
 
   // Anti-reflective crosshairs
-  ctx.strokeStyle = 'rgba(53, 213, 232, 0.4)';
+  ctx.strokeStyle = 'rgba(216, 185, 138, 0.4)';
   ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(64, 20); ctx.lineTo(64, 108);
@@ -263,7 +263,7 @@ export function createTarmacTexture(): THREE.CanvasTexture {
   const ctx = canvas.getContext('2d')!;
 
   // Dark asphalt base
-  ctx.fillStyle = '#0D1623';
+  ctx.fillStyle = '#1a140e';
   ctx.fillRect(0, 0, size, size);
 
   // Asphalt gravel noise
@@ -271,30 +271,30 @@ export function createTarmacTexture(): THREE.CanvasTexture {
     const nx = Math.random() * size;
     const ny = Math.random() * size;
     const shade = Math.floor(18 + Math.random() * 20);
-    ctx.fillStyle = `rgb(${shade}, ${shade + 4}, ${shade + 10})`;
+    ctx.fillStyle = `rgb(${shade + 10}, ${shade + 4}, ${shade})`;
     ctx.fillRect(nx, ny, 1.5, 1.5);
   }
 
   // Tarmac expansion joints
-  ctx.strokeStyle = '#080D16';
+  ctx.strokeStyle = '#120e0a';
   ctx.lineWidth = 3;
   ctx.strokeRect(0, 0, size, size);
 
   // Tactical Helipad / VTOL Landing Marking
-  ctx.strokeStyle = '#35D5E8';
+  ctx.strokeStyle = '#9a6a3a';
   ctx.lineWidth = 4;
   ctx.beginPath();
   ctx.arc(256, 256, 180, 0, Math.PI * 2);
   ctx.stroke();
 
-  ctx.strokeStyle = 'rgba(53, 213, 232, 0.4)';
+  ctx.strokeStyle = 'rgba(216, 185, 138, 0.4)';
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.arc(256, 256, 210, 0, Math.PI * 2);
   ctx.stroke();
 
   // Inner VTOL "H" & "عَصَب" Landing target
-  ctx.strokeStyle = '#5587FF';
+  ctx.strokeStyle = '#b5793f';
   ctx.lineWidth = 12;
   ctx.beginPath();
   ctx.moveTo(200, 190); ctx.lineTo(200, 322);
@@ -304,7 +304,7 @@ export function createTarmacTexture(): THREE.CanvasTexture {
 
   // Arabic Sovereign Marking
   ctx.font = 'bold 22px "IBM Plex Sans Arabic", sans-serif';
-  ctx.fillStyle = '#35D5E8';
+  ctx.fillStyle = '#9a6a3a';
   ctx.textAlign = 'center';
   ctx.fillText('منصة هبوط الطائرات السيادية - عَصَب', 256, 140);
   ctx.fillText('SOVEREIGN VTOL APRON 01', 256, 385);

@@ -1,206 +1,62 @@
-/**
- * ASAB | AEROLAB 3D - Main Application Navigation Sidebar
- * Implements complete hierarchical navigation across ASAB, AEROLAB, and SYSTEM modules.
- */
-
 import React, { useState } from 'react';
-import {
-  Compass,
-  Radio,
-  MapPin,
-  Plane,
-  Network,
-  Activity,
-  Cpu,
-  Share2,
-  ShieldAlert,
-  FileText,
-  Box,
-  Layers,
-  Wind,
-  Navigation,
-  Sliders,
-  FolderGit2,
-  Settings as SettingsIcon,
-  Info,
-  ChevronLeft,
-  ChevronRight,
-  Database,
-  BarChart3,
-  Crosshair,
-  Zap,
-} from 'lucide-react';
+import { Activity, BarChart3, Box, ChevronLeft, ChevronRight, Compass, Crosshair, Database, FileText, Info, Layers, Menu, Navigation, Network, Plane, Radio, RadioTower, Settings, Share2, ShieldAlert, SlidersHorizontal, Wind, X, Zap, Cpu } from 'lucide-react';
 import { useSimulation } from '../../context/SimulationContext';
 
+type Module = { id: string; icon: React.ElementType; label: string; labelAr: string; badge?: number };
+
 export const Sidebar: React.FC = () => {
-  const { settings, navigateToModule, events, nodes } = useSimulation();
-  const [collapsed, setCollapsed] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
-      return window.innerWidth < 768;
-    }
-    return false;
-  });
-
+  const { settings, navigateToModule, events, nodes, mobileSidebarOpen, setMobileSidebarOpen } = useSimulation();
+  const [collapsed, setCollapsed] = useState(false);
   const isArabic = settings.language === 'ar';
-
-  const asabModules = [
-    { id: 'overview', icon: Compass, label: 'Overview', labelAr: 'نظرة عامة' },
-    { id: 'command-center', icon: Radio, label: 'ASAB Command Center', labelAr: 'مركز قيادة عَصَب' },
-    { id: 'cop', icon: Crosshair, label: 'Common Operational Picture', labelAr: 'المشهد العملياتي الموحد (COP)' },
-    { id: 'airborne-fleet', icon: Plane, label: 'Airborne Fleet', labelAr: 'الأسطول الجوي', badge: nodes.length },
-    { id: 'mesh-network', icon: Network, label: 'Network Topology', labelAr: 'طوبولوجيا الشبكة' },
-    { id: 'network-health', icon: Activity, label: 'Network Health', labelAr: 'صحة الشبكة' },
-    { id: 'edge-intelligence', icon: Cpu, label: 'Edge Intelligence', labelAr: 'الذكاء الحافي والضغط' },
-    { id: 'interoperability', icon: Share2, label: 'Interoperability Hub', labelAr: 'منصة التشغيل البيني' },
-    { id: 'resilience', icon: ShieldAlert, label: 'Resilience Scenarios', labelAr: 'سيناريوهات الصمود' },
-    { id: 'event-log', icon: FileText, label: 'System Event Log', labelAr: 'سجل أحداث النظام', badge: events.length },
+  const go = (id: string, env: 'asab' | 'aerolab') => { navigateToModule(id, env); setMobileSidebarOpen(false); };
+  const groups: { title: string; titleAr: string; env: 'asab' | 'aerolab'; items: Module[] }[] = [
+    { title: 'COMMAND', titleAr: 'القيادة', env: 'asab', items: [
+      { id: 'command-center', icon: Radio, label: 'Command Center', labelAr: 'مركز القيادة' },
+      { id: 'cop', icon: Crosshair, label: 'Training Arena', labelAr: 'ساحة التدريب والخريطة' },
+      { id: 'overview', icon: Compass, label: 'Overview', labelAr: 'نظرة عامة' },
+      { id: 'airborne-fleet', icon: Plane, label: 'Airborne Fleet', labelAr: 'الأسطول الجوي', badge: nodes.length },
+      { id: 'resilience', icon: ShieldAlert, label: 'Resilience', labelAr: 'الصمود' },
+      { id: 'mesh-network', icon: Network, label: 'Network Topology', labelAr: 'طوبولوجيا الشبكة' },
+      { id: 'network-health', icon: Activity, label: 'Network Health', labelAr: 'صحة الشبكة' },
+      { id: 'edge-intelligence', icon: Cpu, label: 'Edge Intelligence', labelAr: 'الذكاء الحافي' },
+      { id: 'interoperability', icon: Share2, label: 'Interoperability', labelAr: 'التشغيل البيني' },
+      { id: 'event-log', icon: FileText, label: 'Event Log', labelAr: 'سجل الأحداث', badge: events.length },
+    ] },
+    { title: 'AEROLAB', titleAr: 'أيرولاب', env: 'aerolab', items: [
+      { id: 'flight-simulation', icon: Navigation, label: 'Flight Simulator', labelAr: 'محاكي الطيران' },
+      { id: 'live-flight-simulation', icon: RadioTower, label: 'Live Simulation', labelAr: 'المحاكاة الحية' },
+      { id: 'aircraft-studio', icon: Box, label: 'Aircraft Studio', labelAr: 'استوديو الطائرات' },
+      { id: 'components-library', icon: Layers, label: 'Components', labelAr: 'المكونات' },
+      { id: 'dynamics', icon: Wind, label: 'Flight Dynamics', labelAr: 'ديناميكا الطيران' },
+      { id: 'maneuver-simulation', icon: Menu, label: 'Maneuvers', labelAr: 'المناورات' },
+      { id: 'connection-simulation', icon: Zap, label: 'Connections', labelAr: 'الاتصالات' },
+      { id: 'network-simulation', icon: SlidersHorizontal, label: 'Network Simulation', labelAr: 'محاكاة الشبكة' },
+      { id: 'reports', icon: BarChart3, label: 'Reports', labelAr: 'التقارير' },
+    ] },
+    { title: 'SYSTEM', titleAr: 'النظام', env: 'asab', items: [
+      { id: 'scenario-manager', icon: Database, label: 'Scenarios', labelAr: 'السيناريوهات' },
+      { id: 'settings', icon: Settings, label: 'Settings', labelAr: 'الإعدادات' },
+      { id: 'about-asab', icon: Info, label: 'About', labelAr: 'عن المنظومة' },
+    ] },
   ];
 
-  const aerolabModules = [
-    { id: 'aircraft-studio', icon: Box, label: '3D Aircraft Studio', labelAr: 'استوديو الطائرات ثلاثي الأبعاد' },
-    { id: 'components-library', icon: Layers, label: 'Aircraft Components', labelAr: 'مكتبة مكونات الطائرة' },
-    { id: 'dynamics', icon: Wind, label: 'Dynamic Simulation', labelAr: 'محاكاة ديناميكا الطيران' },
-    { id: 'flight-simulation', icon: Navigation, label: 'Flight Simulation', labelAr: 'محاكي الطيران التفاعلي' },
-    { id: 'connection-simulation', icon: Zap, label: 'Connection Simulation', labelAr: 'محاكاة التوصيل والكهرباء' },
-    { id: 'network-simulation', icon: Sliders, label: 'Network Simulation', labelAr: 'محاكاة حزم الشبكة' },
-    { id: 'maneuver-simulation', icon: FolderGit2, label: 'Maneuver Simulation', labelAr: 'محاكاة المناورات وتفادي العوائق' },
-    { id: 'reports', icon: BarChart3, label: 'Simulation Reports', labelAr: 'تقارير المحاكاة' },
-  ];
-
-  const systemModules = [
-    { id: 'scenario-manager', icon: Database, label: 'Scenario Manager', labelAr: 'مدير السيناريوهات' },
-    { id: 'settings', icon: SettingsIcon, label: 'Settings', labelAr: 'إعدادات المنظومة' },
-    { id: 'about-asab', icon: Info, label: 'About ASAB', labelAr: 'عن منظومة عَصَب' },
-  ];
-
-  return (
-    <aside
-      className={`h-[calc(100vh-3.5rem)] bg-[#0D1623] border-r border-[#172638] transition-all duration-200 flex flex-col justify-between shrink-0 select-none z-10 ${
-        collapsed ? 'w-14' : 'w-64'
-      } fixed md:relative left-0 top-14 md:top-0`}
-    >
-      {/* Scrollable Navigation List */}
-      <div className="flex-1 overflow-y-auto p-2 space-y-4">
-        {/* ASAB COMMAND GROUP */}
-        <div>
-          {!collapsed && (
-            <div className="px-3 py-1.5 text-[10px] font-mono font-bold tracking-wider text-[#35D5E8] uppercase">
-              {isArabic ? 'بيئة القيادة والتحكم' : 'ASAB COMMAND'}
-            </div>
-          )}
-          <div className="space-y-0.5">
-            {asabModules.map((item) => {
-              const Icon = item.icon;
-              const isActive = settings.activeModuleId === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => navigateToModule(item.id, 'asab')}
-                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-mono transition-colors text-left ${
-                    isActive
-                      ? 'bg-[#172638] text-[#35D5E8] border border-[#35D5E8]/40 font-bold'
-                      : 'text-[#92A4B8] hover:bg-[#111E2D] hover:text-[#EDF4FA]'
-                  }`}
-                  title={isArabic ? item.labelAr : item.label}
-                >
-                  <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-[#35D5E8]' : 'text-[#64768B]'}`} />
-                  {!collapsed && (
-                    <span className="truncate flex-1">
-                      {isArabic ? item.labelAr : item.label}
-                    </span>
-                  )}
-                  {!collapsed && item.badge !== undefined && (
-                    <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-[#111E2D] text-[#35D5E8] border border-[#172638]">
-                      {item.badge}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* AEROLAB ENGINEERING GROUP */}
-        <div>
-          {!collapsed && (
-            <div className="px-3 py-1.5 text-[10px] font-mono font-bold tracking-wider text-[#5587FF] uppercase">
-              {isArabic ? 'أيرولاب للهندسة والمحاكاة' : 'AEROLAB ENGINEERING'}
-            </div>
-          )}
-          <div className="space-y-0.5">
-            {aerolabModules.map((item) => {
-              const Icon = item.icon;
-              const isActive = settings.activeModuleId === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => navigateToModule(item.id, 'aerolab')}
-                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-mono transition-colors text-left ${
-                    isActive
-                      ? 'bg-[#172638] text-[#5587FF] border border-[#5587FF]/40 font-bold'
-                      : 'text-[#92A4B8] hover:bg-[#111E2D] hover:text-[#EDF4FA]'
-                  }`}
-                  title={isArabic ? item.labelAr : item.label}
-                >
-                  <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-[#5587FF]' : 'text-[#64768B]'}`} />
-                  {!collapsed && (
-                    <span className="truncate flex-1">
-                      {isArabic ? item.labelAr : item.label}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* SYSTEM GROUP */}
-        <div>
-          {!collapsed && (
-            <div className="px-3 py-1.5 text-[10px] font-mono font-bold tracking-wider text-[#92A4B8] uppercase">
-              {isArabic ? 'إدارة المنظومة' : 'SYSTEM'}
-            </div>
-          )}
-          <div className="space-y-0.5">
-            {systemModules.map((item) => {
-              const Icon = item.icon;
-              const isActive = settings.activeModuleId === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => navigateToModule(item.id)}
-                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-mono transition-colors text-left ${
-                    isActive
-                      ? 'bg-[#172638] text-[#EDF4FA] border border-[#35D5E8]/40 font-bold'
-                      : 'text-[#92A4B8] hover:bg-[#111E2D] hover:text-[#EDF4FA]'
-                  }`}
-                  title={isArabic ? item.labelAr : item.label}
-                >
-                  <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-[#35D5E8]' : 'text-[#64768B]'}`} />
-                  {!collapsed && (
-                    <span className="truncate flex-1">
-                      {isArabic ? item.labelAr : item.label}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
+  return <>
+    {mobileSidebarOpen && <button aria-label={isArabic ? 'إغلاق القائمة' : 'Close menu'} onClick={() => setMobileSidebarOpen(false)} className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden" />}
+    <aside className={`app-sidebar fixed inset-y-0 start-0 z-50 flex w-[84%] max-w-80 flex-col border-e border-[#32261b] bg-[#1a140e] text-[#f6ecdd] shadow-2xl transition-transform duration-300 md:relative md:inset-auto md:z-10 md:h-full md:w-72 md:translate-x-0 md:shadow-none ${mobileSidebarOpen ? 'translate-x-0 rtl:translate-x-0' : '-translate-x-full rtl:translate-x-full' } ${collapsed ? 'md:w-[76px]' : ''}`}>
+      <div className="flex items-center justify-between border-b border-[#32261b] px-4 py-4">
+        {!collapsed && <div><div className="text-[10px] font-bold tracking-[0.18em] text-[#8c7860]">{isArabic ? 'التنقل' : 'NAVIGATION'}</div><div className="mt-1 text-sm font-bold">{isArabic ? 'مساحة العمل' : 'Workspace'}</div></div>}
+        <button onClick={() => setMobileSidebarOpen(false)} className="rounded-lg p-2 text-[#b9a58c] hover:bg-[#32261b] md:hidden"><X className="h-5 w-5" /></button>
+        <button onClick={() => setCollapsed(!collapsed)} className="hidden rounded-lg p-2 text-[#b9a58c] hover:bg-[#32261b] md:block" title={collapsed ? 'Expand' : 'Collapse'}>{collapsed ? <ChevronRight className="h-4 w-4 rtl:rotate-180" /> : <ChevronLeft className="h-4 w-4 rtl:rotate-180" />}</button>
       </div>
-
-      {/* Collapse/Expand Toggle Bar */}
-      <div className="p-2 border-t border-[#172638] flex items-center justify-between">
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="w-full flex items-center justify-center gap-2 py-1.5 rounded bg-[#111E2D] hover:bg-[#172638] text-[#92A4B8] hover:text-[#EDF4FA] text-xs font-mono transition-colors"
-          title={collapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
-          aria-label={collapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
-        >
-          {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-          {!collapsed && <span>{isArabic ? 'طي القائمة' : 'COLLAPSE'}</span>}
-        </button>
+      <div className="flex-1 overflow-y-auto px-3 py-4">
+        {groups.map((group) => <section key={group.title} className="mb-6">
+          {!collapsed && <div className="mb-2 px-3 text-[10px] font-bold tracking-[0.16em] text-[#b5793f]">{isArabic ? group.titleAr : group.title}</div>}
+          <div className="space-y-1">
+            {group.items.map((item) => { const Icon = item.icon; const active = settings.activeModuleId === item.id; return <button key={item.id} onClick={() => go(item.id, group.env)} title={isArabic ? item.labelAr : item.label} className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-start text-xs transition ${active ? 'bg-[#9a6a3a] font-bold text-[#120e0a] shadow-sm' : 'text-[#b9a58c] hover:bg-[#32261b] hover:text-[#f6ecdd]'}`}><Icon className={`h-4 w-4 shrink-0 ${active ? 'text-[#120e0a]' : 'text-[#b99772]'}`} />{!collapsed && <span className="min-w-0 flex-1 truncate">{isArabic ? item.labelAr : item.label}</span>}{!collapsed && item.badge !== undefined && <span className={`rounded-full px-1.5 py-0.5 text-[9px] ${active ? 'bg-black/15 text-[#120e0a]' : 'bg-[#231a12] text-[#b5793f]'}`}>{item.badge}</span>}</button>; })}
+          </div>
+        </section>)}
       </div>
+      {!collapsed && <div className="border-t border-[#32261b] px-4 py-3 text-[10px] text-[#8c7860]"><div className="flex items-center justify-between"><span>{isArabic ? 'منظومة عَصَب' : 'ASAB PLATFORM'}</span><span className="rounded-full bg-[#20331b] px-2 py-1 text-[#8fc46a]">{isArabic ? 'متصل' : 'ONLINE'}</span></div></div>}
     </aside>
-  );
+  </>;
 };

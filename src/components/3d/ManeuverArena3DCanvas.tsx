@@ -50,15 +50,15 @@ export const ManeuverArena3DCanvas: React.FC<ManeuverArenaProps> = ({
     const height = container.clientHeight || 600;
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(sandstormMode ? 0x2b1d0c : 0x080d16);
-    scene.fog = new THREE.FogExp2(sandstormMode ? 0x4a3520 : 0x080d16, sandstormMode ? 0.04 : 0.015);
+    scene.background = new THREE.Color(sandstormMode ? 0x2b1d0c : 0x120e0a);
+    scene.fog = new THREE.FogExp2(sandstormMode ? 0x4a3520 : 0x120e0a, sandstormMode ? 0.04 : 0.015);
 
     const camera = new THREE.PerspectiveCamera(45, width / height, 0.5, 500);
     camera.position.set(25, 20, 35);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, window.innerWidth < 768 ? 1.5 : 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     container.appendChild(renderer.domElement);
 
@@ -68,9 +68,9 @@ export const ManeuverArena3DCanvas: React.FC<ManeuverArenaProps> = ({
     controls.target.set(0, 4, 0);
 
     // Lights
-    const hemi = new THREE.HemisphereLight(sandstormMode ? 0xd4a373 : 0xedf4fa, 0x08101a, 1.2);
+    const hemi = new THREE.HemisphereLight(sandstormMode ? 0xd4a373 : 0xf6ecdd, 0x16110c, 1.2);
     scene.add(hemi);
-    const dir = new THREE.DirectionalLight(sandstormMode ? 0xf4a261 : 0x35d5e8, 1.8);
+    const dir = new THREE.DirectionalLight(sandstormMode ? 0xf4a261 : 0xd8b98a, 1.8);
     dir.position.set(20, 30, 20);
     scene.add(dir);
 
@@ -95,7 +95,7 @@ export const ManeuverArena3DCanvas: React.FC<ManeuverArenaProps> = ({
     const trailPositions = new Float32Array(maxTrailPoints * 3);
     const trailGeo = new THREE.BufferGeometry();
     trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPositions, 3));
-    const trailMat = new THREE.LineBasicMaterial({ color: jammerActive ? 0xf5b82e : 0x35d5e8, transparent: true, opacity: 0.8 });
+    const trailMat = new THREE.LineBasicMaterial({ color: jammerActive ? 0xf5b82e : 0xd8b98a, transparent: true, opacity: 0.8 });
     const trailLine = new THREE.Line(trailGeo, trailMat);
     scene.add(trailLine);
 
@@ -104,6 +104,7 @@ export const ManeuverArena3DCanvas: React.FC<ManeuverArenaProps> = ({
     // Animation Loop
     let animId = 0;
     let t = 0;
+    let lastUiUpdate = 0;
     const render = () => {
       controls.update();
       const currentProps = propsRef.current;
@@ -181,10 +182,15 @@ export const ManeuverArena3DCanvas: React.FC<ManeuverArenaProps> = ({
         if (d < minObstacleDist) minObstacleDist = d;
       });
 
-      setObstacleDistance(Math.round(minObstacleDist));
-      if (currentProps.evasionActive) setSafetyStatus('Evasion Active');
-      else if (currentProps.jammerActive) setSafetyStatus('Jammer Interference');
-      else setSafetyStatus(minObstacleDist < 80 ? 'Evasion Active' : minObstacleDist < 160 ? 'Caution' : 'Clear');
+      // Throttle React state updates to ~10 Hz (was 60 re-renders/second)
+      const nowMs = performance.now();
+      if (nowMs - lastUiUpdate > 100) {
+        lastUiUpdate = nowMs;
+        setObstacleDistance(Math.round(minObstacleDist));
+        if (currentProps.evasionActive) setSafetyStatus('Evasion Active');
+        else if (currentProps.jammerActive) setSafetyStatus('Jammer Interference');
+        else setSafetyStatus(minObstacleDist < 80 ? 'Evasion Active' : minObstacleDist < 160 ? 'Caution' : 'Clear');
+      }
 
       renderer.render(scene, camera);
       animId = requestAnimationFrame(render);
@@ -202,10 +208,13 @@ export const ManeuverArena3DCanvas: React.FC<ManeuverArenaProps> = ({
     };
 
     window.addEventListener('resize', handleResize);
+    const resizeObs = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => handleResize()) : null;
+    resizeObs?.observe(container);
 
     return () => {
       cancelAnimationFrame(animId);
       window.removeEventListener('resize', handleResize);
+      resizeObs?.disconnect();
       controls.dispose();
       renderer.dispose();
       theater.dispose();
@@ -215,18 +224,18 @@ export const ManeuverArena3DCanvas: React.FC<ManeuverArenaProps> = ({
   }, [sandstormMode]);
 
   return (
-    <div className="relative w-full h-full bg-[#080D16] select-none overflow-hidden">
+    <div className="relative w-full h-full bg-[#120e0a] select-none overflow-hidden">
       <div ref={mountRef} className="w-full h-full" data-testid="maneuver-arena-canvas" />
-      <div className="absolute top-4 left-4 pointer-events-none z-10 p-3 rounded-lg bg-[#111E2D]/90 border border-[#172638] text-xs font-mono text-[#EDF4FA] space-y-1 shadow-lg">
-        <div className="text-[10px] text-[#92A4B8]">ACTIVE MANEUVER: <span className="text-[#35D5E8] font-bold">{selectedManeuver}</span></div>
-        <div>PROXIMITY TO OBSTACLE: <span className={obstacleDistance < 100 || evasionActive ? 'text-[#FF5964] font-bold' : 'text-[#3DDC97]'}>{obstacleDistance} M</span></div>
+      <div className="absolute top-4 left-4 pointer-events-none z-10 p-3 rounded-lg bg-[#231a12]/90 border border-[#32261b] text-xs font-mono text-[#f6ecdd] space-y-1 shadow-lg">
+        <div className="text-[10px] text-[#b9a58c]">ACTIVE MANEUVER: <span className="text-[#9a6a3a] font-bold">{selectedManeuver}</span></div>
+        <div>PROXIMITY TO OBSTACLE: <span className={obstacleDistance < 100 || evasionActive ? 'text-[#e8584a] font-bold' : 'text-[#8fc46a]'}>{obstacleDistance} M</span></div>
         <div className="flex items-center gap-2">
-          <span>CORRIDOR STATUS:</span>
-          <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${safetyStatus === 'Clear' && !evasionActive && !jammerActive ? 'bg-[#3DDC97]/20 text-[#3DDC97]' : safetyStatus === 'Caution' ? 'bg-[#F5B82E]/20 text-[#F5B82E]' : safetyStatus === 'Jammer Interference' ? 'bg-[#F5B82E]/20 text-[#F5B82E] animate-pulse' : 'bg-[#FF5964]/20 text-[#FF5964]'}`}>
+          <span>CORRIDOR الحالة:</span>
+          <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${safetyStatus === 'Clear' && !evasionActive && !jammerActive ? 'bg-[#8fc46a]/20 text-[#8fc46a]' : safetyStatus === 'Caution' ? 'bg-[#f5b82e]/20 text-[#f5b82e]' : safetyStatus === 'Jammer Interference' ? 'bg-[#f5b82e]/20 text-[#f5b82e] animate-pulse' : 'bg-[#e8584a]/20 text-[#e8584a]'}`}>
             {evasionActive ? 'EVASION ACTIVE (OVERRIDE)' : safetyStatus}
           </span>
         </div>
-        {windSpeed > 0 && <div className="text-[10px] text-[#35D5E8]">WIND DRIFT: {windSpeed} KN</div>}
+        {windSpeed > 0 && <div className="text-[10px] text-[#9a6a3a]">WIND DRIFT: {windSpeed} KN</div>}
       </div>
     </div>
   );

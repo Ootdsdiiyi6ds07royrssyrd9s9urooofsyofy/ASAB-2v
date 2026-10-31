@@ -68,21 +68,21 @@ export const ManeuverSimulationView: React.FC = () => {
   };
 
   return (
-    <div className="h-[calc(100vh-3.5rem)] flex flex-col bg-[#080D16] font-mono text-xs select-none overflow-hidden relative">
+    <div className="h-full flex flex-col bg-[#120e0a] font-mono text-xs select-none overflow-hidden relative">
       {/* Top Controls Bar */}
-      <div className="h-14 bg-[#0D1623] border-b border-[#172638] px-4 flex flex-wrap items-center justify-between shrink-0 z-10 gap-2">
+      <div className="h-14 bg-[#1a140e] border-b border-[#32261b] px-4 flex flex-wrap items-center justify-between shrink-0 z-10 gap-2">
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 text-sm font-bold text-[#EDF4FA]">
-            <FolderGit2 className="w-4 h-4 text-[#35D5E8]" />
+          <div className="flex items-center gap-2 text-sm font-bold text-[#f6ecdd]">
+            <FolderGit2 className="w-4 h-4 text-[#9a6a3a]" />
             <span>{isArabic ? 'محاكاة المناورات وتفادي العوائق المتقدمة' : 'ADVANCED 3D FLIGHT MANEUVER & TACTICAL ARENA'}</span>
           </div>
 
           <div className="flex items-center gap-1.5 text-[11px]">
-            <span className="text-[#92A4B8] hidden sm:inline">{isArabic ? 'نوع المناورة:' : 'MANEUVER:'}</span>
+            <span className="text-[#b9a58c] hidden sm:inline">{isArabic ? 'نوع المناورة:' : 'MANEUVER:'}</span>
             <select
               value={selectedManeuver}
               onChange={(e) => setSelectedManeuver(e.target.value)}
-              className="p-1 rounded bg-[#111E2D] border border-[#172638] text-[#35D5E8] font-bold focus:outline-none"
+              className="p-1 rounded bg-[#231a12] border border-[#32261b] text-[#9a6a3a] font-bold focus:outline-none"
             >
               {maneuvers.map((m) => (
                 <option key={m.id} value={m.id}>{m.name}</option>
@@ -98,8 +98,8 @@ export const ManeuverSimulationView: React.FC = () => {
             onClick={() => setIsPaused(!isPaused)}
             className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-bold border transition-colors ${
               isPaused
-                ? 'bg-[#3DDC97]/20 text-[#3DDC97] border-[#3DDC97]/50 hover:bg-[#3DDC97]/30'
-                : 'bg-[#F5B82E]/20 text-[#F5B82E] border-[#F5B82E]/50 hover:bg-[#F5B82E]/30'
+                ? 'bg-[#8fc46a]/20 text-[#8fc46a] border-[#8fc46a]/50 hover:bg-[#8fc46a]/30'
+                : 'bg-[#f5b82e]/20 text-[#f5b82e] border-[#f5b82e]/50 hover:bg-[#f5b82e]/30'
             }`}
             title={isPaused ? 'استئناف المحاكاة' : 'إيقاف مؤقت'}
           >
@@ -108,15 +108,15 @@ export const ManeuverSimulationView: React.FC = () => {
           </button>
 
           {/* Speed Selector */}
-          <div className="flex items-center gap-1 bg-[#111E2D] px-2 py-1 rounded border border-[#172638]">
-            <Zap className="w-3.5 h-3.5 text-[#35D5E8]" />
-            <span className="text-[#92A4B8] hidden sm:inline">سرعة:</span>
+          <div className="flex items-center gap-1 bg-[#231a12] px-2 py-1 rounded border border-[#32261b]">
+            <Zap className="w-3.5 h-3.5 text-[#9a6a3a]" />
+            <span className="text-[#b9a58c] hidden sm:inline">سرعة:</span>
             {[0.5, 1.0, 2.0, 4.0].map((s) => (
               <button
                 key={s}
                 onClick={() => setSpeed(s)}
                 className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
-                  speed === s ? 'bg-[#35D5E8] text-[#080D16]' : 'text-[#92A4B8] hover:text-[#EDF4FA]'
+                  speed === s ? 'bg-[#9a6a3a] text-[#120e0a]' : 'text-[#b9a58c] hover:text-[#f6ecdd]'
                 }`}
               >
                 {s}x
@@ -129,8 +129,8 @@ export const ManeuverSimulationView: React.FC = () => {
             onClick={() => setEvasionActive(!evasionActive)}
             className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-bold border transition-colors ${
               evasionActive
-                ? 'bg-[#FF5964] text-white border-[#FF5964] animate-pulse'
-                : 'bg-[#FF5964]/10 text-[#FF5964] border-[#FF5964]/40 hover:bg-[#FF5964]/20'
+                ? 'bg-[#e8584a] text-white border-[#e8584a] animate-pulse'
+                : 'bg-[#e8584a]/10 text-[#e8584a] border-[#e8584a]/40 hover:bg-[#e8584a]/20'
             }`}
           >
             <ShieldAlert className="w-3.5 h-3.5" />
@@ -140,7 +140,7 @@ export const ManeuverSimulationView: React.FC = () => {
           {/* Reset */}
           <button
             onClick={handleReset}
-            className="p-1.5 rounded bg-[#111E2D] border border-[#172638] text-[#92A4B8] hover:text-[#EDF4FA] hover:border-[#35D5E8]/40 transition-colors"
+            className="p-1.5 rounded bg-[#231a12] border border-[#32261b] text-[#b9a58c] hover:text-[#f6ecdd] hover:border-[#9a6a3a]/40 transition-colors"
             title="إعادة ضبط"
           >
             <RotateCcw className="w-3.5 h-3.5" />
@@ -149,7 +149,7 @@ export const ManeuverSimulationView: React.FC = () => {
       </div>
 
       {/* Sub-toolbar for Sliders (Altitude, Agility, Weather & Jammers) */}
-      <div className="bg-[#0A101C] border-b border-[#172638] px-4 py-2 flex flex-wrap items-center gap-6 shrink-0 text-[11px] text-[#92A4B8]">
+      <div className="bg-[#18130e] border-b border-[#32261b] px-4 py-2 flex flex-wrap items-center gap-6 shrink-0 text-[11px] text-[#b9a58c]">
         <div className="flex items-center gap-2">
           <span>{isArabic ? 'الارتفاع:' : 'Altitude:'}</span>
           <input
@@ -159,9 +159,9 @@ export const ManeuverSimulationView: React.FC = () => {
             step="1"
             value={altitudeOffset}
             onChange={(e) => setAltitudeOffset(Number(e.target.value))}
-            className="w-24 accent-[#35D5E8] cursor-pointer"
+            className="w-24 accent-[#9a6a3a] cursor-pointer"
           />
-          <span className="text-[#35D5E8] font-bold w-6">{altitudeOffset}M</span>
+          <span className="text-[#9a6a3a] font-bold w-6">{altitudeOffset}M</span>
         </div>
 
         <div className="flex items-center gap-2">
@@ -173,13 +173,13 @@ export const ManeuverSimulationView: React.FC = () => {
             step="0.25"
             value={agility}
             onChange={(e) => setAgility(Number(e.target.value))}
-            className="w-24 accent-[#35D5E8] cursor-pointer"
+            className="w-24 accent-[#9a6a3a] cursor-pointer"
           />
-          <span className="text-[#35D5E8] font-bold w-6">{agility}x</span>
+          <span className="text-[#9a6a3a] font-bold w-6">{agility}x</span>
         </div>
 
         <div className="flex items-center gap-2">
-          <Wind className="w-3.5 h-3.5 text-[#35D5E8]" />
+          <Wind className="w-3.5 h-3.5 text-[#9a6a3a]" />
           <span>{isArabic ? 'سرعة الرياح:' : 'Wind:'}</span>
           <input
             type="range"
@@ -188,16 +188,16 @@ export const ManeuverSimulationView: React.FC = () => {
             step="5"
             value={windSpeed}
             onChange={(e) => setWindSpeed(Number(e.target.value))}
-            className="w-24 accent-[#35D5E8] cursor-pointer"
+            className="w-24 accent-[#9a6a3a] cursor-pointer"
           />
-          <span className="text-[#35D5E8] font-bold w-8">{windSpeed}Kn</span>
+          <span className="text-[#9a6a3a] font-bold w-8">{windSpeed}Kn</span>
         </div>
 
         <div className="flex items-center gap-3">
           <button
             onClick={() => setJammerActive(!jammerActive)}
             className={`flex items-center gap-1 px-2 py-1 rounded text-[10px] font-bold border transition-colors ${
-              jammerActive ? 'bg-[#F5B82E] text-[#080D16] border-[#F5B82E]' : 'bg-[#111E2D] text-[#F5B82E] border-[#F5B82E]/40 hover:bg-[#F5B82E]/20'
+              jammerActive ? 'bg-[#f5b82e] text-[#120e0a] border-[#f5b82e]' : 'bg-[#231a12] text-[#f5b82e] border-[#f5b82e]/40 hover:bg-[#f5b82e]/20'
             }`}
           >
             <Radio className="w-3 h-3" />
@@ -207,14 +207,14 @@ export const ManeuverSimulationView: React.FC = () => {
           <button
             onClick={() => setSandstormMode(!sandstormMode)}
             className={`flex items-center gap-1 px-2 py-1 rounded text-[10px] font-bold border transition-colors ${
-              sandstormMode ? 'bg-[#E07A5F] text-white border-[#E07A5F]' : 'bg-[#111E2D] text-[#E07A5F] border-[#E07A5F]/40 hover:bg-[#E07A5F]/20'
+              sandstormMode ? 'bg-[#e07a5f] text-white border-[#e07a5f]' : 'bg-[#231a12] text-[#e07a5f] border-[#e07a5f]/40 hover:bg-[#e07a5f]/20'
             }`}
           >
             <CloudFog className="w-3 h-3" />
             <span>{isArabic ? 'عاصفة رملية' : 'Sandstorm'}</span>
           </button>
 
-          <div className="flex items-center gap-1 text-[10px] text-[#3DDC97] bg-[#3DDC97]/10 px-2 py-1 rounded border border-[#3DDC97]/30">
+          <div className="flex items-center gap-1 text-[10px] text-[#8fc46a] bg-[#8fc46a]/10 px-2 py-1 rounded border border-[#8fc46a]/30">
             <MapPin className="w-3 h-3" />
             <span>{isArabic ? `نقاط المسار: ${waypointsCount}` : `Waypoints: ${waypointsCount}`}</span>
           </div>

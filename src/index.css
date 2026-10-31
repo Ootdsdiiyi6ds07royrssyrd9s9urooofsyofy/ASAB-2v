@@ -2,29 +2,38 @@
 
 @layer base {
   :root {
-    --bg-main: #080D16;
-    --bg-secondary: #0D1623;
-    --bg-panel: #111E2D;
-    --bg-elevated: #172638;
-    --primary-cyan: #35D5E8;
-    --tech-blue: #5587FF;
-    --success-green: #3DDC97;
-    --warning-amber: #F5B82E;
-    --critical-red: #FF5964;
-    --text-primary: #EDF4FA;
-    --text-secondary: #92A4B8;
-    --text-muted: #64768B;
+    --bg-main: #120e0a;
+    --bg-secondary: #1a140e;
+    --bg-panel: #231a12;
+    --bg-elevated: #32261b;
+    --primary-cyan: #9a6a3a;
+    --tech-blue: #b5793f;
+    --success-green: #8fc46a;
+    --warning-amber: #f5b82e;
+    --critical-red: #e8584a;
+    --text-primary: #f6ecdd;
+    --text-secondary: #b9a58c;
+    --text-muted: #8c7860;
   }
 
   body {
-    background-color: #080D16;
-    color: #EDF4FA;
+    background-color: #120e0a;
+    background-image: radial-gradient(1200px 600px at 85% -10%, rgba(216,185,138,0.07), transparent 60%), radial-gradient(900px 500px at 0% 110%, rgba(181,121,63,0.07), transparent 60%);
+    background-attachment: fixed;
+    color: #f6ecdd;
     font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif;
     overflow-x: hidden;
   }
 
   [dir="rtl"] {
-    font-family: 'IBM Plex Sans Arabic', system-ui, -apple-system, sans-serif;
+    font-family: 'Noto Sans Arabic', 'IBM Plex Sans Arabic', system-ui, -apple-system, sans-serif;
+    font-weight: 500;
+    line-height: 1.65;
+    letter-spacing: 0;
+    word-spacing: 0.025em;
+    font-synthesis: none;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
 }
 
@@ -35,16 +44,16 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #080D16;
+  background: #120e0a;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1e3046;
+  background: #3d2f22;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #35D5E8;
+  background: #9a6a3a;
 }
 
 .font-tech {
@@ -52,5 +61,156 @@
 }
 
 .font-arabic {
-  font-family: 'IBM Plex Sans Arabic', sans-serif;
+  font-family: 'Noto Sans Arabic', 'IBM Plex Sans Arabic', sans-serif;
 }
+
+[dir="rtl"] .font-mono,
+[dir="rtl"] .font-tech {
+  font-family: 'Noto Sans Arabic', 'IBM Plex Sans Arabic', sans-serif;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+
+[dir="rtl"] button,
+[dir="rtl"] input,
+[dir="rtl"] select,
+[dir="rtl"] textarea {
+  font-family: inherit;
+}
+
+[dir="rtl"] h1,
+[dir="rtl"] h2,
+[dir="rtl"] h3 {
+  letter-spacing: -0.015em;
+  line-height: 1.45;
+}
+
+/* Mobile hardening */
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  overscroll-behavior: none;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button, [role="button"] {
+  touch-action: manipulation;
+}
+
+/* Keep WebGL canvases from hijacking page scroll gestures */
+canvas {
+  touch-action: none;
+  max-width: 100%;
+  display: block;
+}
+
+@media (max-width: 767px) {
+  ::-webkit-scrollbar { width: 3px; height: 3px; }
+  input, select, textarea { font-size: 16px; } /* prevents iOS zoom on focus */
+}
+
+/* Warm sovereign theme polish */
+::selection { background: rgba(216, 185, 138, 0.35); color: #f6ecdd; }
+
+:focus-visible {
+  outline: 2px solid #9a6a3a;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+header {
+  background-image: linear-gradient(180deg, rgba(216,185,138,0.06), transparent);
+}
+
+button { transition: transform .12s ease, background-color .15s ease, border-color .15s ease; }
+button:active { transform: scale(0.97); }
+button:disabled { pointer-events: none; }
+
+.ui-btn {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 10px;
+  font-weight: 700;
+  letter-spacing: .01em;
+  box-shadow: 0 5px 14px rgba(0, 0, 0, .18), inset 0 1px 0 rgba(255, 255, 255, .10);
+}
+
+.ui-btn::after {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: '';
+  background: linear-gradient(115deg, transparent 25%, rgba(255, 255, 255, .18), transparent 72%);
+  transform: translateX(-130%);
+  transition: transform .45s ease;
+}
+
+.ui-btn:hover::after { transform: translateX(130%); }
+.ui-btn:active { box-shadow: inset 0 2px 5px rgba(0, 0, 0, .22); }
+
+.ui-btn-primary {
+  border: 1px solid rgba(246, 236, 221, .22);
+  background: linear-gradient(135deg, #e2c18f, #b5793f);
+  color: #211810;
+}
+
+.ui-btn-secondary {
+  border: 1px solid rgba(216, 185, 138, .34);
+  background: linear-gradient(135deg, rgba(62, 45, 31, .98), rgba(33, 24, 16, .98));
+  color: #9a6a3a;
+}
+
+.ui-btn-icon {
+  border: 1px solid rgba(216, 185, 138, .22);
+  background: linear-gradient(135deg, #f6ecdd, #1b130d);
+  color: #b9a58c;
+}
+
+.ui-chip {
+  border: 1px solid rgba(216, 185, 138, .22);
+  border-radius: 999px;
+  background: rgba(33, 24, 16, .82);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05);
+}
+
+.ui-chip:hover {
+  border-color: rgba(216, 185, 138, .75);
+  background: rgba(216, 185, 138, .12);
+  box-shadow: 0 4px 12px rgba(216, 185, 138, .10);
+}
+
+.ui-panel {
+  background-image: linear-gradient(135deg, rgba(216, 185, 138, .045), transparent 40%);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, .16), inset 0 1px 0 rgba(255, 255, 255, .03);
+}
+
+/* Consistent touch targets and readable density on small flight-deck screens. */
+@media (max-width: 767px) {
+  button, [role="button"] { min-height: 40px; }
+  header button { min-height: 36px; }
+  .app-header { min-height: 56px !important; }
+  .app-header > div { height: 56px !important; }
+  main { min-width: 0; max-width: 100vw; overflow: hidden; }
+  main > * { min-width: 0; max-width: 100%; }
+  table { max-width: none; }
+  pre { max-width: calc(100vw - 2rem); }
+  input, select, textarea { max-width: 100%; }
+}
+
+@media (max-width: 420px) {
+  .font-tech { letter-spacing: -0.02em; }
+  main { padding-bottom: env(safe-area-inset-bottom, 0px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
+@keyframes spin-slow { to { transform: rotate(360deg); } }
+.animate-spin-slow { animation: spin-slow 8s linear infinite; }

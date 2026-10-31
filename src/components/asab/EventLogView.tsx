@@ -66,15 +66,15 @@ export const EventLogView: React.FC = () => {
   ];
 
   return (
-    <div className="h-[calc(100vh-3.5rem)] overflow-y-auto p-6 space-y-6 bg-[#080D16] font-mono text-xs select-none">
+    <div className="h-full overflow-y-auto p-3 sm:p-6 space-y-4 sm:space-y-6 bg-[#120e0a] font-mono text-xs select-none">
       {/* Title */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-[#172638]">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-[#32261b]">
         <div>
-          <h1 className="text-xl font-bold text-[#EDF4FA] flex items-center gap-2">
-            <FileText className="w-5 h-5 text-[#35D5E8]" />
+          <h1 className="text-xl font-bold text-[#f6ecdd] flex items-center gap-2">
+            <FileText className="w-5 h-5 text-[#9a6a3a]" />
             <span>{isArabic ? 'سجل أحداث النظام والتحذيرات' : 'SYSTEM & AUDIT EVENT LOG'}</span>
           </h1>
-          <p className="text-[#92A4B8] text-[11px] font-sans">
+          <p className="text-[#b9a58c] text-[11px] font-sans">
             {isArabic
               ? 'تسجيل زمني دقيق لكافة تحولات الحالة، اتصالات الطائرات، والتحذيرات الأمنية.'
               : 'Chronological telemetry log recording node state transitions, mesh reconvergence, and operational alerts.'}
@@ -83,23 +83,23 @@ export const EventLogView: React.FC = () => {
 
         <button
           onClick={handleExportCsv}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#111E2D] hover:bg-[#172638] border border-[#172638] text-[#EDF4FA] transition-colors"
+          className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#231a12] hover:bg-[#32261b] border border-[#32261b] text-[#f6ecdd] transition-colors"
         >
-          <Download className="w-4 h-4 text-[#35D5E8]" />
-          <span>EXPORT CSV</span>
+          <Download className="w-4 h-4 text-[#9a6a3a]" />
+          <span>تصدير CSV</span>
         </button>
       </div>
 
       {/* Filter and Search Bar */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#64768B]" />
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#8c7860]" />
           <input
             type="text"
             placeholder="Search events by keyword, node ID, or title..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 rounded-lg bg-[#0D1623] border border-[#172638] text-[#EDF4FA] placeholder-[#64768B] focus:outline-none focus:border-[#35D5E8]"
+            className="w-full pl-9 pr-3 py-2 rounded-lg bg-[#1a140e] border border-[#32261b] text-[#f6ecdd] placeholder-[#8c7860] focus:outline-none focus:border-[#9a6a3a]"
           />
         </div>
 
@@ -110,8 +110,8 @@ export const EventLogView: React.FC = () => {
               onClick={() => setSelectedCategory(cat)}
               className={`px-3 py-2 rounded-lg text-xs whitespace-nowrap transition-colors ${
                 selectedCategory === cat
-                  ? 'bg-[#35D5E8] text-[#080D16] font-bold'
-                  : 'bg-[#0D1623] text-[#92A4B8] hover:text-[#EDF4FA] border border-[#172638]'
+                  ? 'bg-[#9a6a3a] text-[#120e0a] font-bold'
+                  : 'bg-[#1a140e] text-[#b9a58c] hover:text-[#f6ecdd] border border-[#32261b]'
               }`}
             >
               {cat === 'all' ? 'All Events' : cat}
@@ -123,44 +123,44 @@ export const EventLogView: React.FC = () => {
       {/* Event Stream List */}
       <div className="space-y-2">
         {filteredEvents.length === 0 ? (
-          <div className="p-8 text-center text-[#64768B] bg-[#0D1623] rounded-xl border border-[#172638]">
+          <div className="p-8 text-center text-[#8c7860] bg-[#1a140e] rounded-xl border border-[#32261b]">
             No matching events found.
           </div>
         ) : (
           filteredEvents.map((evt) => (
             <div
               key={evt.id}
-              className="p-3.5 rounded-xl bg-[#0D1623] border border-[#172638] hover:border-[#35D5E8]/30 transition-colors flex items-start justify-between gap-4"
+              className="p-3.5 rounded-xl bg-[#1a140e] border border-[#32261b] hover:border-[#9a6a3a]/30 transition-colors flex items-start justify-between gap-4"
             >
               <div className="flex items-start gap-3">
                 <div className="mt-0.5">
                   {evt.severity === 'success' ? (
-                    <CheckCircle2 className="w-4 h-4 text-[#3DDC97]" />
+                    <CheckCircle2 className="w-4 h-4 text-[#8fc46a]" />
                   ) : evt.severity === 'warning' ? (
-                    <AlertTriangle className="w-4 h-4 text-[#F5B82E]" />
+                    <AlertTriangle className="w-4 h-4 text-[#f5b82e]" />
                   ) : evt.severity === 'critical' ? (
-                    <AlertCircle className="w-4 h-4 text-[#FF5964]" />
+                    <AlertCircle className="w-4 h-4 text-[#e8584a]" />
                   ) : (
-                    <Info className="w-4 h-4 text-[#35D5E8]" />
+                    <Info className="w-4 h-4 text-[#9a6a3a]" />
                   )}
                 </div>
 
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-[#EDF4FA]">{evt.title}</span>
+                    <span className="font-bold text-[#f6ecdd]">{evt.title}</span>
                     {evt.sourceNodeId && (
-                      <span className="px-1.5 py-0.2 rounded bg-[#111E2D] text-[#35D5E8] text-[10px]">
+                      <span className="px-1.5 py-0.2 rounded bg-[#231a12] text-[#9a6a3a] text-[10px]">
                         {evt.sourceNodeId}
                       </span>
                     )}
                   </div>
-                  <p className="text-[#92A4B8] text-[11px] font-sans">{evt.description}</p>
+                  <p className="text-[#b9a58c] text-[11px] font-sans">{evt.description}</p>
                 </div>
               </div>
 
               <div className="text-right shrink-0">
-                <div className="text-[#64768B] text-[10px]">{evt.timestamp}</div>
-                <div className="text-[10px] text-[#35D5E8] uppercase tracking-wider">{evt.category}</div>
+                <div className="text-[#8c7860] text-[10px]">{evt.timestamp}</div>
+                <div className="text-[10px] text-[#9a6a3a] uppercase tracking-wider">{evt.category}</div>
               </div>
             </div>
           ))

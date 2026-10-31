@@ -1,0 +1,13 @@
+{
+  "name": "ASAB | AEROLAB 3D",
+  "short_name": "ASAB",
+  "description": "Sovereign Airborne Command & AEROLAB 3D Simulation",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "dir": "rtl",
+  "lang": "ar",
+  "background_color": "#120e0a",
+  "theme_color": "#1a140e",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}

@@ -43,7 +43,7 @@ function createBattlefieldGroundTexture(mode: BattlefieldEnvironmentMode = 'warz
 
   // Base terrain color depending on mode
   if (mode === 'warzone-flir') {
-    ctx.fillStyle = '#10141a';
+    ctx.fillStyle = '#181512';
     ctx.fillRect(0, 0, size, size);
   } else if (mode === 'warzone-sandstorm') {
     ctx.fillStyle = '#4a3520';
@@ -66,7 +66,7 @@ function createBattlefieldGroundTexture(mode: BattlefieldEnvironmentMode = 'warz
   ctx.putImageData(imgData, 0, 0);
 
   // Tactical Military Grid Lines (MGRS Grid)
-  ctx.strokeStyle = mode === 'warzone-flir' ? 'rgba(53, 213, 232, 0.25)' : 'rgba(53, 213, 232, 0.18)';
+  ctx.strokeStyle = mode === 'warzone-flir' ? 'rgba(216, 185, 138, 0.25)' : 'rgba(216, 185, 138, 0.18)';
   ctx.lineWidth = 1.5;
   const step = 128;
   for (let x = 0; x <= size; x += step) {
@@ -84,7 +84,7 @@ function createBattlefieldGroundTexture(mode: BattlefieldEnvironmentMode = 'warz
 
   // Tactical Sector Coordinates & Military Annotations
   ctx.font = 'bold 13px monospace';
-  ctx.fillStyle = mode === 'warzone-flir' ? 'rgba(53, 213, 232, 0.6)' : 'rgba(53, 213, 232, 0.45)';
+  ctx.fillStyle = mode === 'warzone-flir' ? 'rgba(216, 185, 138, 0.6)' : 'rgba(216, 185, 138, 0.45)';
   const sectors = ['ALPHA-01', 'BRAVO-02', 'CHARLIE-03', 'DELTA-04', 'ECHO-05', 'FOXTROT-06', 'GOLF-07', 'HOTEL-08'];
   for (let i = 0; i < 8; i++) {
     for (let j = 0; j < 8; j++) {
@@ -105,7 +105,7 @@ function createBattlefieldGroundTexture(mode: BattlefieldEnvironmentMode = 'warz
   ];
   for (const c of craters) {
     const blastGrad = ctx.createRadialGradient(c.x, c.y, 5, c.x, c.y, c.r);
-    blastGrad.addColorStop(0, '#05070a');
+    blastGrad.addColorStop(0, '#090706');
     blastGrad.addColorStop(0.5, '#151310');
     blastGrad.addColorStop(0.85, '#201812');
     blastGrad.addColorStop(1, 'transparent');
@@ -115,7 +115,7 @@ function createBattlefieldGroundTexture(mode: BattlefieldEnvironmentMode = 'warz
     ctx.fill();
 
     // Shockwave ring
-    ctx.strokeStyle = 'rgba(255, 89, 100, 0.3)';
+    ctx.strokeStyle = 'rgba(232, 88, 74, 0.3)';
     ctx.lineWidth = 2;
     ctx.stroke();
   }
@@ -142,7 +142,7 @@ function createBattlefieldGroundTexture(mode: BattlefieldEnvironmentMode = 'warz
   ctx.save();
   ctx.translate(512, 512);
   // Concrete hexagon apron
-  ctx.fillStyle = '#222d3b';
+  ctx.fillStyle = '#352e28';
   ctx.beginPath();
   const hexR = 140;
   for (let i = 0; i < 6; i++) {
@@ -156,19 +156,19 @@ function createBattlefieldGroundTexture(mode: BattlefieldEnvironmentMode = 'warz
   ctx.fill();
 
   // Yellow & Black Perimeter Warning Chevrons
-  ctx.strokeStyle = '#F5B82E';
+  ctx.strokeStyle = '#f5b82e';
   ctx.lineWidth = 4;
   ctx.stroke();
 
   // Tactical Helipad Cross & Stencils
-  ctx.strokeStyle = '#35D5E8';
+  ctx.strokeStyle = '#9a6a3a';
   ctx.lineWidth = 3;
   ctx.beginPath();
   ctx.arc(0, 0, 75, 0, Math.PI * 2);
   ctx.stroke();
 
   ctx.font = 'bold 52px monospace';
-  ctx.fillStyle = '#35D5E8';
+  ctx.fillStyle = '#9a6a3a';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText('H', 0, -2);
@@ -176,7 +176,7 @@ function createBattlefieldGroundTexture(mode: BattlefieldEnvironmentMode = 'warz
   // Arabic FOB Sovereign Title
   ctx.font = 'bold 15px "IBM Plex Sans Arabic", sans-serif';
   ctx.direction = 'rtl';
-  ctx.fillStyle = '#EDF4FA';
+  ctx.fillStyle = '#f6ecdd';
   ctx.fillText('قاعدة العمليات المتقدمة - عَصَب', 0, 48);
 
   ctx.restore();
@@ -289,6 +289,43 @@ export function buildBattlefieldTheater(initialMode: BattlefieldEnvironmentMode 
   terrainMesh.position.y = -0.05;
   rootGroup.add(terrainMesh);
 
+  // 1.5. Low-poly mountain silhouettes and rock outcrops for a readable flight horizon
+  const landmarkGroup = new THREE.Group();
+  landmarkGroup.name = 'TerrainLandmarks';
+  const landmarkGeometries: THREE.BufferGeometry[] = [];
+  const mountainMat = new THREE.MeshStandardMaterial({ color: 0x2b2119, roughness: 1, metalness: 0.02, flatShading: true });
+  const ridgeMat = new THREE.MeshStandardMaterial({ color: 0x493727, roughness: 0.96, metalness: 0.03, flatShading: true });
+  const mountainGeo = new THREE.ConeGeometry(15, 30, 7, 2);
+  landmarkGeometries.push(mountainGeo);
+  [
+    { x: -70, y: 12, z: -70, scale: 1.25 },
+    { x: -42, y: 8, z: -78, scale: 0.82 },
+    { x: 66, y: 10, z: -72, scale: 1.05 },
+    { x: 82, y: 7, z: -44, scale: 0.74 },
+  ].forEach((peak) => {
+    const mountain = new THREE.Mesh(mountainGeo, mountainMat);
+    mountain.position.set(peak.x, peak.y, peak.z);
+    mountain.scale.set(peak.scale, peak.scale, peak.scale);
+    mountain.rotation.y = peak.x * 0.03;
+    mountain.castShadow = true;
+    landmarkGroup.add(mountain);
+  });
+
+  const rockGeo = new THREE.DodecahedronGeometry(2.4, 0);
+  landmarkGeometries.push(rockGeo);
+  [
+    [-30, 2, -18, 1.8], [28, 1.5, -28, 1.35], [48, 2, 18, 2.1],
+    [-52, 1.8, 34, 1.6], [64, 1.2, 42, 1.2], [-14, 1.4, 62, 1.4],
+  ].forEach(([x, y, z, scale], index) => {
+    const rock = new THREE.Mesh(rockGeo, index % 2 ? ridgeMat : mountainMat);
+    rock.position.set(x, y, z);
+    rock.scale.set(scale, scale * (0.7 + (index % 3) * 0.15), scale * 0.85);
+    rock.rotation.set(index * 0.25, index * 0.7, index * 0.18);
+    rock.castShadow = true;
+    landmarkGroup.add(rock);
+  });
+  rootGroup.add(landmarkGroup);
+
   // 2. Forward Operating Base (FOB) Structures Group
   const fobGroup = new THREE.Group();
   fobGroup.name = 'FOB_Structures';
@@ -321,7 +358,7 @@ export function buildBattlefieldTheater(initialMode: BattlefieldEnvironmentMode 
   // Hardened Tactical Command Bunker
   const bunkerGeo = new THREE.BoxGeometry(7, 2.4, 5);
   const bunkerMat = new THREE.MeshStandardMaterial({
-    color: 0x1f2a38,
+    color: 0x322b25,
     roughness: 0.7,
     metalness: 0.3,
   });
@@ -333,7 +370,7 @@ export function buildBattlefieldTheater(initialMode: BattlefieldEnvironmentMode 
 
   // Bunker Roof Satellite Terminal Dish
   const bunkerDishGeo = new THREE.SphereGeometry(1.0, 16, 12, 0, Math.PI * 2, 0, Math.PI * 0.4);
-  const dishMat = new THREE.MeshStandardMaterial({ color: 0x35d5e8, roughness: 0.3, metalness: 0.8 });
+  const dishMat = new THREE.MeshStandardMaterial({ color: 0xd8b98a, roughness: 0.3, metalness: 0.8 });
   const bunkerDish = new THREE.Mesh(bunkerDishGeo, dishMat);
   bunkerDish.rotation.x = -Math.PI / 3;
   bunkerDish.position.set(-9, 2.8, -6);
@@ -341,7 +378,7 @@ export function buildBattlefieldTheater(initialMode: BattlefieldEnvironmentMode 
 
   // Stacked Military Cargo Containers (ISO Containers)
   const containerGeo = new THREE.BoxGeometry(5.2, 1.8, 2.0);
-  const containerColors = [0x4d5b45, 0x5a4a35, 0x1a2636];
+  const containerColors = [0x4d5b45, 0x5a4a35, 0x302720];
   const containerPositions = [
     { x: -9.5, y: 0.9, z: 4.5, rot: 0.2, c: 0 },
     { x: -9.5, y: 2.7, z: 4.5, rot: 0.2, c: 1 },
@@ -368,7 +405,7 @@ export function buildBattlefieldTheater(initialMode: BattlefieldEnvironmentMode 
 
   // Mast trellis structure
   const mastGeo = new THREE.CylinderGeometry(0.2, 0.45, 8.5, 6);
-  const mastMat = new THREE.MeshStandardMaterial({ color: 0x223246, roughness: 0.5, metalness: 0.8 });
+  const mastMat = new THREE.MeshStandardMaterial({ color: 0x3e332a, roughness: 0.5, metalness: 0.8 });
   const mast = new THREE.Mesh(mastGeo, mastMat);
   mast.position.y = 4.25;
   mast.castShadow = true;
@@ -383,10 +420,10 @@ export function buildBattlefieldTheater(initialMode: BattlefieldEnvironmentMode 
   // Rotating Radar Array Dish
   const radarDishGeo = new THREE.BoxGeometry(3.6, 1.2, 0.35);
   const radarDishMat = new THREE.MeshStandardMaterial({
-    color: 0x35d5e8,
+    color: 0xd8b98a,
     roughness: 0.3,
     metalness: 0.85,
-    emissive: 0x113344,
+    emissive: 0x392a1c,
   });
   const radarDish = new THREE.Mesh(radarDishGeo, radarDishMat);
   radarDish.position.y = 9.4;
@@ -405,7 +442,7 @@ export function buildBattlefieldTheater(initialMode: BattlefieldEnvironmentMode 
   towerGroup.position.set(12, 0, 11);
 
   const towerLegsGeo = new THREE.CylinderGeometry(0.12, 0.22, 5.5, 4);
-  const towerLegsMat = new THREE.MeshStandardMaterial({ color: 0x1c2b3d, roughness: 0.6, metalness: 0.7 });
+  const towerLegsMat = new THREE.MeshStandardMaterial({ color: 0x362c23, roughness: 0.6, metalness: 0.7 });
   const towerLegs = new THREE.Mesh(towerLegsGeo, towerLegsMat);
   towerLegs.position.y = 2.75;
   towerGroup.add(towerLegs);
@@ -423,7 +460,7 @@ export function buildBattlefieldTheater(initialMode: BattlefieldEnvironmentMode 
   const searchLightConeGeo = new THREE.ConeGeometry(3.5, 24, 16, 1, true);
   searchLightConeGeo.rotateX(Math.PI / 2);
   const searchLightConeMat = new THREE.MeshBasicMaterial({
-    color: 0x35d5e8,
+    color: 0xd8b98a,
     transparent: true,
     opacity: 0.18,
     side: THREE.DoubleSide,
@@ -433,7 +470,7 @@ export function buildBattlefieldTheater(initialMode: BattlefieldEnvironmentMode 
   searchlightCone.position.set(0, 0, 12);
   searchlightGroup.add(searchlightCone);
 
-  const spot = new THREE.SpotLight(0x35d5e8, 8, 40, Math.PI / 6, 0.4);
+  const spot = new THREE.SpotLight(0xd8b98a, 8, 40, Math.PI / 6, 0.4);
   spot.position.set(0, 0, 0);
   spot.target.position.set(0, -6, 25);
   searchlightGroup.add(spot);
@@ -478,7 +515,7 @@ export function buildBattlefieldTheater(initialMode: BattlefieldEnvironmentMode 
 
   // Runway / Helipad Perimeter Threshold Lights (Green and Amber LED points)
   const runwayLights: THREE.PointLight[] = [];
-  const lightColors = [0x3ddc97, 0xf5b82e, 0x35d5e8];
+  const lightColors = [0x8fc46a, 0xf5b82e, 0xd8b98a];
   for (let i = 0; i < 8; i++) {
     const angle = (i / 8) * Math.PI * 2;
     const lx = Math.cos(angle) * 7.5;
@@ -612,7 +649,7 @@ export function buildBattlefieldTheater(initialMode: BattlefieldEnvironmentMode 
   const targetRingGeo = new THREE.RingGeometry(4, 4.4, 32);
   targetRingGeo.rotateX(-Math.PI / 2);
   const targetRingMat = new THREE.MeshBasicMaterial({
-    color: 0xff5964,
+    color: 0xe8584a,
     side: THREE.DoubleSide,
     transparent: true,
     opacity: 0.7,
@@ -630,7 +667,7 @@ export function buildBattlefieldTheater(initialMode: BattlefieldEnvironmentMode 
   wpPoints.forEach((pt, idx) => {
     const torus = new THREE.Mesh(
       new THREE.TorusGeometry(2.2, 0.08, 8, 24),
-      new THREE.MeshBasicMaterial({ color: 0x35d5e8, transparent: true, opacity: 0.75 })
+      new THREE.MeshBasicMaterial({ color: 0xd8b98a, transparent: true, opacity: 0.75 })
     );
     torus.position.copy(pt);
     torus.rotation.x = Math.PI / 2;
@@ -642,7 +679,7 @@ export function buildBattlefieldTheater(initialMode: BattlefieldEnvironmentMode 
       new THREE.Vector3(pt.x, pt.y, pt.z),
     ]);
     const lineMat = new THREE.LineDashedMaterial({
-      color: 0x35d5e8,
+      color: 0xd8b98a,
       dashSize: 1,
       gapSize: 0.6,
       transparent: true,
@@ -659,31 +696,31 @@ export function buildBattlefieldTheater(initialMode: BattlefieldEnvironmentMode 
   const setMode = (mode: BattlefieldEnvironmentMode, scene: THREE.Scene) => {
     if (mode === 'hangar-studio') {
       rootGroup.visible = false;
-      scene.background = new THREE.Color(0x080d16);
-      scene.fog = new THREE.FogExp2(0x080d16, 0.022);
+      scene.background = new THREE.Color(0x120e0a);
+      scene.fog = new THREE.FogExp2(0x120e0a, 0.022);
       return;
     }
 
     rootGroup.visible = true;
 
     if (mode === 'warzone-day') {
-      scene.background = new THREE.Color(0x1a212d);
-      scene.fog = new THREE.FogExp2(0x1a212d, 0.009);
+      scene.background = new THREE.Color(0x29231e);
+      scene.fog = new THREE.FogExp2(0x29231e, 0.009);
       terrainMat.color.setHex(0xffffff);
       smokeMat.color.setHex(0x776655);
       smokeMat.opacity = 0.35;
     } else if (mode === 'warzone-night') {
-      scene.background = new THREE.Color(0x050a12);
-      scene.fog = new THREE.FogExp2(0x050a12, 0.014);
-      terrainMat.color.setHex(0x556677);
-      smokeMat.color.setHex(0x223344);
+      scene.background = new THREE.Color(0x0f0b08);
+      scene.fog = new THREE.FogExp2(0x0f0b08, 0.014);
+      terrainMat.color.setHex(0x6f655d);
+      smokeMat.color.setHex(0x3c322a);
       smokeMat.opacity = 0.25;
     } else if (mode === 'warzone-flir') {
       // High contrast thermal
-      scene.background = new THREE.Color(0x03060a);
-      scene.fog = new THREE.FogExp2(0x03060a, 0.016);
-      terrainMat.color.setHex(0x223344);
-      smokeMat.color.setHex(0x5588aa);
+      scene.background = new THREE.Color(0x080605);
+      scene.fog = new THREE.FogExp2(0x080605, 0.016);
+      terrainMat.color.setHex(0x3c322a);
+      smokeMat.color.setHex(0x977e68);
       smokeMat.opacity = 0.4;
     } else if (mode === 'warzone-sandstorm') {
       scene.background = new THREE.Color(0x382818);
@@ -759,6 +796,9 @@ export function buildBattlefieldTheater(initialMode: BattlefieldEnvironmentMode 
     domeMat.dispose();
     targetRingGeo.dispose();
     targetRingMat.dispose();
+    landmarkGeometries.forEach((geometry) => geometry.dispose());
+    mountainMat.dispose();
+    ridgeMat.dispose();
   };
 
   return {

@@ -41,24 +41,24 @@ export const AircraftStudioView: React.FC = () => {
   });
 
   return (
-    <div className="h-[calc(100vh-3.5rem)] flex bg-[#080D16] font-mono text-xs select-none overflow-hidden relative" dir={isArabic ? 'rtl' : 'ltr'}>
+    <div className="h-full flex bg-[#120e0a] font-mono text-xs select-none overflow-hidden relative" dir={isArabic ? 'rtl' : 'ltr'}>
       {/* 1. Left Collapsible Component Tree Panel */}
       {isTreeOpen ? (
-        <aside className="w-72 bg-[#0D1623] border-e border-[#172638] flex flex-col justify-between shrink-0 z-10 overflow-hidden transition-all duration-300">
+        <aside className="absolute md:static inset-y-0 start-0 w-[85%] max-w-72 md:w-72 bg-[#1a140e] border-e border-[#32261b] flex flex-col justify-between shrink-0 z-20 overflow-hidden transition-all duration-300">
           {/* Search & Header */}
-          <div className="p-3 border-b border-[#172638] space-y-2">
-            <div className="flex items-center justify-between text-xs font-bold text-[#EDF4FA]">
+          <div className="p-3 border-b border-[#32261b] space-y-2">
+            <div className="flex items-center justify-between text-xs font-bold text-[#f6ecdd]">
               <div className="flex items-center gap-1.5">
-                <Layers className="w-4 h-4 text-[#35D5E8]" />
+                <Layers className="w-4 h-4 text-[#9a6a3a]" />
                 <span>{isArabic ? 'شجرة مكونات الطائرة' : 'COMPONENT HIERARCHY'}</span>
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-[10px] text-[#35D5E8] px-1.5 py-0.5 rounded bg-[#111E2D]">
+                <span className="text-[10px] text-[#9a6a3a] px-1.5 py-0.5 rounded bg-[#231a12]">
                   {components.length}
                 </span>
                 <button
                   onClick={() => setIsTreeOpen(false)}
-                  className="p-1 rounded text-[#92A4B8] hover:text-[#EDF4FA] hover:bg-[#172638] transition-colors cursor-pointer"
+                  className="p-1 rounded text-[#b9a58c] hover:text-[#f6ecdd] hover:bg-[#32261b] transition-colors cursor-pointer"
                   title={isArabic ? 'طي القائمة' : 'Collapse tree'}
                 >
                   {isArabic ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronLeft className="w-3.5 h-3.5" />}
@@ -71,22 +71,22 @@ export const AircraftStudioView: React.FC = () => {
               onClick={() => selectComponent('')}
               className={`w-full py-1.5 px-2 rounded-md text-[11px] flex items-center justify-center gap-1.5 border transition-all cursor-pointer ${
                 !selectedComponentId
-                  ? 'bg-[#35D5E8]/20 text-[#35D5E8] border-[#35D5E8]'
-                  : 'bg-[#111E2D] text-[#92A4B8] border-[#172638] hover:border-[#35D5E8]/40 hover:text-[#EDF4FA]'
+                  ? 'bg-[#9a6a3a]/20 text-[#9a6a3a] border-[#9a6a3a]'
+                  : 'bg-[#231a12] text-[#b9a58c] border-[#32261b] hover:border-[#9a6a3a]/40 hover:text-[#f6ecdd]'
               }`}
             >
-              <Sparkles className="w-3 h-3 text-[#35D5E8]" />
+              <Sparkles className="w-3 h-3 text-[#9a6a3a]" />
               <span>{isArabic ? 'عرض الطائرة كاملة (تجميع)' : 'View Full Aircraft'}</span>
             </button>
 
             <div className="relative">
-              <Search className="w-3.5 h-3.5 absolute start-2.5 top-1/2 -translate-y-1/2 text-[#64768B]" />
+              <Search className="w-3.5 h-3.5 absolute start-2.5 top-1/2 -translate-y-1/2 text-[#8c7860]" />
               <input
                 type="text"
                 placeholder={isArabic ? 'بحث في أجزاء الطائرة...' : 'Search components...'}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full ps-8 pe-2.5 py-1.5 rounded bg-[#111E2D] border border-[#172638] text-[11px] text-[#EDF4FA] focus:outline-none focus:border-[#35D5E8]"
+                className="w-full ps-8 pe-2.5 py-1.5 rounded bg-[#231a12] border border-[#32261b] text-[11px] text-[#f6ecdd] focus:outline-none focus:border-[#9a6a3a]"
               />
             </div>
           </div>
@@ -101,22 +101,22 @@ export const AircraftStudioView: React.FC = () => {
                   onClick={() => selectComponent(comp.id)}
                   className={`w-full flex items-center justify-between p-2 rounded-lg text-start transition-colors cursor-pointer ${
                     isSelected
-                      ? 'bg-[#172638] text-[#35D5E8] border border-[#35D5E8]/40 font-bold'
-                      : 'text-[#92A4B8] hover:bg-[#111E2D] hover:text-[#EDF4FA]'
+                      ? 'bg-[#32261b] text-[#9a6a3a] border border-[#9a6a3a]/40 font-bold'
+                      : 'text-[#b9a58c] hover:bg-[#231a12] hover:text-[#f6ecdd]'
                   }`}
                 >
                   <div className="truncate">
                     <div className="truncate text-xs">{isArabic ? comp.nameAr : comp.name}</div>
-                    <div className="text-[10px] text-[#64768B]">{comp.category} • {comp.massKg} kg</div>
+                    <div className="text-[10px] text-[#8c7860]">{comp.category} • {comp.massKg} kg</div>
                   </div>
-                  <div className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-[#35D5E8]' : 'bg-[#172638]'}`} />
+                  <div className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-[#9a6a3a]' : 'bg-[#32261b]'}`} />
                 </button>
               );
             })}
           </div>
 
           {/* Model info footer */}
-          <div className="p-3 border-t border-[#172638] bg-[#0A101A] text-[10px] text-[#64768B] flex justify-between">
+          <div className="p-3 border-t border-[#32261b] bg-[#16120e] text-[10px] text-[#8c7860] flex justify-between">
             <span>ASAB-V100 VTOL</span>
             <span>48.2 kg Gross MTOW</span>
           </div>
@@ -124,7 +124,7 @@ export const AircraftStudioView: React.FC = () => {
       ) : (
         <button
           onClick={() => setIsTreeOpen(true)}
-          className="absolute top-4 start-4 z-30 p-2 rounded-md bg-[#0D1623]/90 border border-[#172638] text-[#92A4B8] hover:text-[#35D5E8] shadow-lg transition-colors cursor-pointer"
+          className="absolute top-4 start-4 z-30 p-2 rounded-md bg-[#1a140e]/90 border border-[#32261b] text-[#b9a58c] hover:text-[#9a6a3a] shadow-lg transition-colors cursor-pointer"
           title={isArabic ? 'فتح شجرة المكونات' : 'Open tree'}
         >
           <Layers className="w-4 h-4" />
@@ -138,22 +138,22 @@ export const AircraftStudioView: React.FC = () => {
 
       {/* 3. Right Technical Component Inspector */}
       {selectedComponent && isInspectorOpen && (
-        <aside className="w-80 bg-[#0D1623] border-s border-[#172638] p-4 flex flex-col justify-between overflow-y-auto shrink-0 z-10 space-y-4 transition-all duration-300">
+        <aside className="absolute md:static inset-y-0 end-0 w-[88%] max-w-80 md:w-80 bg-[#1a140e] border-s border-[#32261b] p-4 flex flex-col justify-between overflow-y-auto shrink-0 z-20 space-y-4 transition-all duration-300">
           <div className="space-y-4">
             {/* Component Title & Close Button */}
-            <div className="pb-3 border-b border-[#172638] flex items-start justify-between gap-2">
+            <div className="pb-3 border-b border-[#32261b] flex items-start justify-between gap-2">
               <div>
-                <div className="text-[10px] text-[#35D5E8] font-bold tracking-wider uppercase">
+                <div className="text-[10px] text-[#9a6a3a] font-bold tracking-wider uppercase">
                   {selectedComponent.category}
                 </div>
-                <div className="text-base font-bold text-[#EDF4FA] font-sans">
+                <div className="text-base font-bold text-[#f6ecdd] font-sans">
                   {isArabic ? selectedComponent.nameAr : selectedComponent.name}
                 </div>
-                <div className="text-[10px] text-[#64768B]">{selectedComponent.id}</div>
+                <div className="text-[10px] text-[#8c7860]">{selectedComponent.id}</div>
               </div>
               <button
                 onClick={() => setIsInspectorOpen(false)}
-                className="p-1 rounded text-[#92A4B8] hover:text-[#EDF4FA] hover:bg-[#172638] transition-colors cursor-pointer"
+                className="p-1 rounded text-[#b9a58c] hover:text-[#f6ecdd] hover:bg-[#32261b] transition-colors cursor-pointer"
                 title={isArabic ? 'إخفاء لوحة المواصفات' : 'Hide Inspector'}
               >
                 {isArabic ? <ChevronLeft className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
@@ -162,52 +162,52 @@ export const AircraftStudioView: React.FC = () => {
 
             {/* Description & Function */}
             <div className="space-y-1.5">
-              <div className="text-[10px] text-[#64768B] uppercase font-bold">
+              <div className="text-[10px] text-[#8c7860] uppercase font-bold">
                 {isArabic ? 'الوصف الهندسي' : 'DESCRIPTION'}
               </div>
-              <p className="text-[11px] text-[#92A4B8] font-sans leading-relaxed">
+              <p className="text-[11px] text-[#b9a58c] font-sans leading-relaxed">
                 {selectedComponent.description}
               </p>
             </div>
 
             <div className="space-y-1.5">
-              <div className="text-[10px] text-[#64768B] uppercase font-bold">
+              <div className="text-[10px] text-[#8c7860] uppercase font-bold">
                 {isArabic ? 'الوظيفة الأساسية' : 'PRIMARY FUNCTION'}
               </div>
-              <p className="text-[11px] text-[#EDF4FA] font-sans leading-relaxed p-2.5 rounded-lg bg-[#111E2D] border border-[#172638]">
+              <p className="text-[11px] text-[#f6ecdd] font-sans leading-relaxed p-2.5 rounded-lg bg-[#231a12] border border-[#32261b]">
                 {selectedComponent.functionDesc}
               </p>
             </div>
 
             {/* Physical Specs & Energy Grid */}
             <div className="grid grid-cols-2 gap-2 text-[11px]">
-              <div className="p-2.5 rounded-lg bg-[#111E2D] border border-[#172638] flex items-center gap-2">
-                <Weight className="w-4 h-4 text-[#35D5E8]" />
+              <div className="p-2.5 rounded-lg bg-[#231a12] border border-[#32261b] flex items-center gap-2">
+                <Weight className="w-4 h-4 text-[#9a6a3a]" />
                 <div>
-                  <div className="text-[10px] text-[#64768B]">{isArabic ? 'الكتلة' : 'MASS'}</div>
-                  <div className="font-bold text-[#EDF4FA]">{selectedComponent.massKg} {isArabic ? 'كجم' : 'kg'}</div>
+                  <div className="text-[10px] text-[#8c7860]">{isArabic ? 'الكتلة' : 'MASS'}</div>
+                  <div className="font-bold text-[#f6ecdd]">{selectedComponent.massKg} {isArabic ? 'كجم' : 'kg'}</div>
                 </div>
               </div>
 
-              <div className="p-2.5 rounded-lg bg-[#111E2D] border border-[#172638] flex items-center gap-2">
-                <Zap className="w-4 h-4 text-[#F5B82E]" />
+              <div className="p-2.5 rounded-lg bg-[#231a12] border border-[#32261b] flex items-center gap-2">
+                <Zap className="w-4 h-4 text-[#f5b82e]" />
                 <div>
-                  <div className="text-[10px] text-[#64768B]">{isArabic ? 'استهلاك الطاقة' : 'POWER'}</div>
-                  <div className="font-bold text-[#EDF4FA]">{selectedComponent.powerDrawWatts} {isArabic ? 'واط' : 'W'}</div>
+                  <div className="text-[10px] text-[#8c7860]">{isArabic ? 'استهلاك الطاقة' : 'POWER'}</div>
+                  <div className="font-bold text-[#f6ecdd]">{selectedComponent.powerDrawWatts} {isArabic ? 'واط' : 'W'}</div>
                 </div>
               </div>
             </div>
 
             {/* Technical Specifications Key-Values */}
             <div className="space-y-1.5">
-              <div className="text-[10px] text-[#64768B] uppercase font-bold">
+              <div className="text-[10px] text-[#8c7860] uppercase font-bold">
                 {isArabic ? 'المواصفات الفنية' : 'ENGINEERING PARAMETERS'}
               </div>
-              <div className="p-2.5 rounded-lg bg-[#111E2D] border border-[#172638] space-y-1.5 text-[11px]">
+              <div className="p-2.5 rounded-lg bg-[#231a12] border border-[#32261b] space-y-1.5 text-[11px]">
                 {Object.entries(selectedComponent.specs).map(([k, v]) => (
                   <div key={k} className="flex justify-between">
-                    <span className="text-[#92A4B8]">{k.replace('_', ' ')}:</span>
-                    <span className="text-[#EDF4FA] font-bold">{v}</span>
+                    <span className="text-[#b9a58c]">{k.replace('_', ' ')}:</span>
+                    <span className="text-[#f6ecdd] font-bold">{v}</span>
                   </div>
                 ))}
               </div>
@@ -215,10 +215,10 @@ export const AircraftStudioView: React.FC = () => {
           </div>
 
           {/* Quick Action: Deselect to view all */}
-          <div className="pt-3 border-t border-[#172638]">
+          <div className="pt-3 border-t border-[#32261b]">
             <button
               onClick={() => selectComponent('')}
-              className="w-full py-2 rounded-lg bg-[#111E2D] hover:bg-[#172638] border border-[#172638] text-[#35D5E8] text-xs font-bold transition-colors cursor-pointer flex items-center justify-center gap-2"
+              className="w-full py-2 rounded-lg bg-[#231a12] hover:bg-[#32261b] border border-[#32261b] text-[#9a6a3a] text-xs font-bold transition-colors cursor-pointer flex items-center justify-center gap-2"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               <span>{isArabic ? 'عرض الطائرة كاملة' : 'Show Full Aircraft'}</span>
@@ -231,7 +231,7 @@ export const AircraftStudioView: React.FC = () => {
       {selectedComponent && !isInspectorOpen && (
         <button
           onClick={() => setIsInspectorOpen(true)}
-          className="absolute top-4 end-4 z-30 p-2 rounded-md bg-[#0D1623]/90 border border-[#172638] text-[#92A4B8] hover:text-[#35D5E8] shadow-lg transition-colors cursor-pointer"
+          className="absolute top-4 end-4 z-30 p-2 rounded-md bg-[#1a140e]/90 border border-[#32261b] text-[#b9a58c] hover:text-[#9a6a3a] shadow-lg transition-colors cursor-pointer"
           title={isArabic ? 'فتح لوحة المواصفات' : 'Open Inspector'}
         >
           <Eye className="w-4 h-4" />
