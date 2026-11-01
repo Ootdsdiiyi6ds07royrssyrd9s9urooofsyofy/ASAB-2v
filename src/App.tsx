@@ -1,14 +1,12 @@
 /**
- * @license
- * SPDX-License-Identifier: Apache-2.0
+ * ASAB | AEROLAB — responsive application shell
  */
-
 import React, { lazy, Suspense } from 'react';
 import { SimulationProvider, useSimulation } from './context/SimulationContext';
 import { AppHeader } from './components/layout/AppHeader';
 import { Sidebar } from './components/layout/Sidebar';
 import { ViewErrorBoundary } from './components/layout/ErrorBoundary';
-import { Compass, Crosshair, Plane, Box, FolderGit2 } from 'lucide-react';
+import { Activity, Box, Compass, Crosshair, Plane, RadioTower } from 'lucide-react';
 
 const OverviewView = lazy(() => import('./components/asab/OverviewView').then((module) => ({ default: module.OverviewView })));
 const CommandCenterView = lazy(() => import('./components/asab/CommandCenterView').then((module) => ({ default: module.CommandCenterView })));
@@ -36,7 +34,12 @@ const AboutAsabView = lazy(() => import('./components/system/AboutAsabView').the
 const PageLoading: React.FC = () => {
   const { settings } = useSimulation();
   const isArabic = settings.language === 'ar';
-  return <div className="flex h-full items-center justify-center bg-[#120e0a] text-[#b9a58c]"><div className="flex items-center gap-3 rounded-2xl border border-[#32261b] bg-[#1a140e] px-5 py-4 text-sm shadow-xl"><span className="h-2.5 w-2.5 animate-pulse rounded-full bg-[#9a6a3a]" />{isArabic ? 'جارٍ تجهيز الصفحة…' : 'Loading page…'}</div></div>;
+  return (
+    <div className="page-loading" role="status" aria-live="polite">
+      <span className="status-dot status-dot-live" />
+      <span>{isArabic ? 'جارٍ تجهيز مساحة العمل' : 'Preparing workspace'}</span>
+    </div>
+  );
 };
 
 const MainContentRouter: React.FC = () => {
@@ -79,11 +82,39 @@ const MobileBottomNav: React.FC = () => {
     { id: 'cop', env: 'asab' as const, icon: Crosshair, label: isArabic ? 'المشهد' : 'COP' },
     { id: 'airborne-fleet', env: 'asab' as const, icon: Plane, label: isArabic ? 'الأسطول' : 'Fleet' },
     { id: 'aircraft-studio', env: 'aerolab' as const, icon: Box, label: isArabic ? 'الاستوديو' : 'Studio' },
-    { id: 'maneuver-simulation', env: 'aerolab' as const, icon: FolderGit2, label: isArabic ? 'المناورات' : 'Maneuver' },
+    { id: 'live-flight-simulation', env: 'aerolab' as const, icon: RadioTower, label: isArabic ? 'المحاكاة' : 'Live' },
   ];
-  return <nav aria-label={isArabic ? 'التنقل السريع للجوال' : 'Mobile Quick Navigation'} style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }} className="flex min-h-14 shrink-0 items-center justify-around border-t border-[#32261b] bg-[#1a140e]/95 px-1 backdrop-blur-md md:hidden">{navItems.map((item) => { const Icon = item.icon; const isActive = settings.activeModuleId === item.id; return <button key={item.id} onClick={() => navigateToModule(item.id, item.env)} className={`flex min-w-0 flex-1 flex-col items-center justify-center rounded-lg px-1 py-1.5 transition-colors ${isActive ? 'font-bold text-[#9a6a3a]' : 'text-[#b9a58c] hover:text-[#f6ecdd]'}`}><Icon className="h-4 w-4" /><span className="mt-0.5 max-w-full truncate text-[10px]">{item.label}</span></button>; })}</nav>;
+  return (
+    <nav aria-label={isArabic ? 'التنقل السريع للجوال' : 'Mobile quick navigation'} className="mobile-bottom-nav">
+      {navItems.map((item) => {
+        const Icon = item.icon;
+        const active = settings.activeModuleId === item.id;
+        return (
+          <button key={item.id} type="button" onClick={() => navigateToModule(item.id, item.env)} className={`mobile-nav-item ${active ? 'is-active' : ''}`} aria-current={active ? 'page' : undefined}>
+            <Icon aria-hidden="true" />
+            <span>{item.label}</span>
+          </button>
+        );
+      })}
+    </nav>
+  );
 };
 
 export default function App() {
-  return <SimulationProvider><div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-[#120e0a] text-[#f6ecdd]"><AppHeader /><div className="relative flex flex-1 overflow-hidden"><Sidebar /><main className="relative min-h-0 min-w-0 flex-1 overflow-hidden"><MainContentRouter /></main></div><MobileBottomNav /></div></SimulationProvider>;
+  return (
+    <SimulationProvider>
+      <div className="app-shell">
+        <a className="skip-link" href="#main-content">انتقل إلى المحتوى</a>
+        <AppHeader />
+        <div className="app-body">
+          <Sidebar />
+          <main id="main-content" className="app-main" tabIndex={-1}>
+            <MainContentRouter />
+          </main>
+        </div>
+        <MobileBottomNav />
+        <div className="app-status-bar" aria-hidden="true"><Activity /> <span>ASAB // AEROLAB</span><span className="status-dot status-dot-live" /></div>
+      </div>
+    </SimulationProvider>
+  );
 }
