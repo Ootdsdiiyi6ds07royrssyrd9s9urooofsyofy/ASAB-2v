@@ -3,6 +3,7 @@
  */
 import React, { lazy, Suspense } from 'react';
 import { SimulationProvider, useSimulation } from './context/SimulationContext';
+import { AssetProvider } from './context/AssetContext';
 import { AppHeader } from './components/layout/AppHeader';
 import { Sidebar } from './components/layout/Sidebar';
 import { ViewErrorBoundary } from './components/layout/ErrorBoundary';
@@ -44,6 +45,13 @@ const PageLoading: React.FC = () => {
 
 const MainContentRouter: React.FC = () => {
   const { settings } = useSimulation();
+  const pageTitles: Record<string, [string, string]> = {
+    overview: ['نظرة عامة', 'Overview'], 'command-center': ['مركز القيادة', 'Command Center'], cop: ['ساحة التدريب', 'Training Arena'],
+    'airborne-fleet': ['الأسطول الجوي', 'Airborne Fleet'], 'mesh-network': ['طوبولوجيا الشبكة', 'Network Topology'], 'network-health': ['صحة الشبكة', 'Network Health'],
+    'edge-intelligence': ['الذكاء الطرفي', 'Edge Intelligence'], interoperability: ['التشغيل البيني', 'Interoperability'], resilience: ['الصمود التشغيلي', 'Resilience'], 'event-log': ['سجل الأحداث', 'Event Log'],
+    'aircraft-studio': ['استوديو الطائرة', 'Aircraft Studio'], 'components-library': ['مكتبة المكونات', 'Components'], dynamics: ['الديناميكا الجوية', 'Aerodynamics'], 'flight-simulation': ['محاكي الطيران', 'Flight Simulation'],
+    'live-flight-simulation': ['المحاكاة الحية', 'Live Simulation'], 'connection-simulation': ['محاكاة الاتصال', 'Connection Simulation'], 'network-simulation': ['محاكاة الشبكة', 'Network Simulation'], 'maneuver-simulation': ['المناورات', 'Maneuvers'], reports: ['التقارير', 'Reports'], 'scenario-manager': ['مدير السيناريوهات', 'Scenarios'], settings: ['الإعدادات', 'Settings'], 'about-asab': ['عن عَصَب', 'About ASAB'],
+  };
   const page = (() => {
     switch (settings.activeModuleId) {
       case 'overview': return <OverviewView />;
@@ -71,7 +79,8 @@ const MainContentRouter: React.FC = () => {
       default: return <CommandCenterView />;
     }
   })();
-  return <Suspense fallback={<PageLoading />}><ViewErrorBoundary>{page}</ViewErrorBoundary></Suspense>;
+  const [titleAr, titleEn] = pageTitles[settings.activeModuleId] ?? ['مساحة العمل', 'Workspace'];
+  return <Suspense fallback={<PageLoading />}><ViewErrorBoundary><div className="page-route-shell"><header className="route-page-header"><div><span className="route-page-kicker">ASAB / AEROLAB · {settings.activeEnvironment === 'asab' ? 'ASAB' : 'AEROLAB'}</span><h1>{settings.language === 'ar' ? titleAr : titleEn}</h1></div><div className="route-page-meta"><span className="status-dot status-dot-live" />{settings.language === 'ar' ? 'تشغيل محلي' : 'Local run'}<b>UI 2.0</b></div></header><div className="route-data-badge" role="note"><span className="status-dot status-dot-live" /><span>{settings.language === 'ar' ? 'بيانات محاكاة محسوبة محليًا · ليست قياسات ميدانية' : 'Locally derived simulation data · not field measurements'}</span></div><div className="page-route-content">{page}</div></div></ViewErrorBoundary></Suspense>;
 };
 
 const MobileBottomNav: React.FC = () => {
@@ -102,7 +111,8 @@ const MobileBottomNav: React.FC = () => {
 
 export default function App() {
   return (
-    <SimulationProvider>
+    <AssetProvider>
+      <SimulationProvider>
       <div className="app-shell">
         <a className="skip-link" href="#main-content">انتقل إلى المحتوى</a>
         <AppHeader />
@@ -115,6 +125,7 @@ export default function App() {
         <MobileBottomNav />
         <div className="app-status-bar" aria-hidden="true"><Activity /> <span>ASAB // AEROLAB</span><span className="status-dot status-dot-live" /></div>
       </div>
-    </SimulationProvider>
+      </SimulationProvider>
+    </AssetProvider>
   );
 }

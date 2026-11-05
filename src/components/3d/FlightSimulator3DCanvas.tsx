@@ -6,7 +6,9 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { useSimulation } from '../../context/SimulationContext';
+import { useAssets } from '../../context/AssetContext';
 import { calculateAeroDynamics } from '../../utils/rules';
 import { buildAircraftModel } from './AircraftModel3D';
 import { buildBattlefieldTheater } from './BattlefieldTheater';
@@ -137,6 +139,8 @@ export const FlightSimulator3DCanvas: React.FC<FlightSimProps> = ({
   activeScenario = 'Basic Takeoff',
 }) => {
   const { settings } = useSimulation();
+  const { urls } = useAssets();
+  const customAircraftUrl = urls.aircraft;
   const isArabic = settings.language === 'ar';
   const mountRef = useRef<HTMLDivElement>(null);
   const [telemetry, setTelemetry] = useState<FlightTelemetryData>({
@@ -153,6 +157,7 @@ export const FlightSimulator3DCanvas: React.FC<FlightSimProps> = ({
   const camModeRef = useRef<CamMode>('chase');
   const pausedRef = useRef(false);
   const callbackRef = useRef(onTelemetryUpdate);
+  const customAircraftRef = useRef<THREE.Object3D | null>(null);
   useEffect(() => { callbackRef.current = onTelemetryUpdate; }, [onTelemetryUpdate]);
   useEffect(() => { camModeRef.current = cameraMode; }, [cameraMode]);
   useEffect(() => { pausedRef.current = isPaused; }, [isPaused]);
@@ -237,6 +242,17 @@ export const FlightSimulator3DCanvas: React.FC<FlightSimProps> = ({
     const aircraft = buildAircraftModel('stealth');
     aircraft.rootGroup.rotation.order = 'YXZ'; // yaw -> pitch -> roll, so pitch/roll are in the aircraft's own frame
     scene.add(aircraft.rootGroup);
+    if (customAircraftUrl) {
+      aircraft.rootGroup.visible = false;
+      new GLTFLoader().load(customAircraftUrl, (gltf) => {
+        const custom = gltf.scene;
+        custom.scale.setScalar(1);
+        custom.position.y = 0.35;
+        custom.traverse((child) => { if (child instanceof THREE.Mesh) { child.castShadow = true; child.receiveShadow = true; } });
+        customAircraftRef.current = custom;
+        scene.add(custom);
+      });
+    }
 
     scene.add(new THREE.HemisphereLight(0xb0d4ff, 0x08101a, 1.2));
     const sun = new THREE.DirectionalLight(0xffffff, 2.0);
@@ -376,6 +392,13 @@ export const FlightSimulator3DCanvas: React.FC<FlightSimProps> = ({
         aircraft.rootGroup.rotation.x = -pitchRad;
         aircraft.rootGroup.rotation.z = (fs.roll * Math.PI) / 180;
         aircraft.rootGroup.updateMatrixWorld(true);
+        if (customAircraftRef.current) {
+          customAircraftRef.current.position.set(fs.x, fs.y + 0.35, fs.z);
+          customAircraftRef.current.rotation.order = 'YXZ';
+          customAircraftRef.current.rotation.y = headingRad;
+          customAircraftRef.current.rotation.x = -pitchRad;
+          customAircraftRef.current.rotation.z = (fs.roll * Math.PI) / 180;
+        }
 
         const spin = 0.12 + (fs.throttle / 100) * 0.5;
         aircraft.rotorBlades.forEach((r, idx) => {
@@ -491,11 +514,21 @@ export const FlightSimulator3DCanvas: React.FC<FlightSimProps> = ({
       trailMat.dispose();
       theater.dispose();
       aircraft.dispose();
+      if (customAircraftRef.current) {
+        customAircraftRef.current.traverse((child) => {
+          if (child instanceof THREE.Mesh) {
+            child.geometry.dispose();
+            const materials = Array.isArray(child.material) ? child.material : [child.material];
+            materials.forEach((material) => material.dispose());
+          }
+        });
+        customAircraftRef.current = null;
+      }
       renderer.dispose();
       if (container.contains(renderer.domElement)) container.removeChild(renderer.domElement);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [settings.quality]);
+  }, [settings.quality, customAircraftUrl]);
 
   const isArabicRef = useRef(isArabic);
   useEffect(() => { isArabicRef.current = isArabic; }, [isArabic]);

@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { Airspace3DCanvas } from '../3d/Airspace3DCanvas';
 import { useSimulation } from '../../context/SimulationContext';
+import { useAssets } from '../../context/AssetContext';
 import type { AircraftNode } from '../../types';
 
 const trainingMapPoints = [
@@ -36,6 +37,26 @@ const trainingMapPoints = [
   { x: 74, y: 20 },
 ];
 
+type ImportedRoute = { points: Array<{ x: number; y: number; label?: string }> };
+
+function parseImportedRoutes(text: string): ImportedRoute | null {
+  try {
+    const parsed = JSON.parse(text);
+    const features = parsed?.type === 'FeatureCollection' ? parsed.features : Array.isArray(parsed) ? parsed : [parsed];
+    const points: ImportedRoute['points'] = [];
+    features.forEach((feature: any) => {
+      const geometry = feature?.geometry ?? feature;
+      const coords = geometry?.type === 'LineString' ? geometry.coordinates : geometry?.type === 'Point' ? [geometry.coordinates] : feature?.points;
+      if (!Array.isArray(coords)) return;
+      coords.forEach((pair: any) => { if (Array.isArray(pair) && pair.length >= 2) points.push({ x: Number(pair[0]), y: Number(pair[1]), label: feature?.properties?.name }); });
+    });
+    return points.length ? { points } : null;
+  } catch {
+    const points = text.split(/\r?\n/).slice(1).map((line) => line.split(',')).map(([x, y, ...label]) => ({ x: Number(x), y: Number(y), label: label.join(',') })).filter((point) => Number.isFinite(point.x) && Number.isFinite(point.y));
+    return points.length ? { points } : null;
+  }
+}
+
 const TrainingMap: React.FC<{
   nodes: AircraftNode[];
   selectedNodeId: string | null;
@@ -44,7 +65,8 @@ const TrainingMap: React.FC<{
   trainingActive: boolean;
   convoyPatrolMode: boolean;
   defenseGridActive: boolean;
-}> = ({ nodes, selectedNodeId, selectNode, isArabic, trainingActive, convoyPatrolMode, defenseGridActive }) => (
+  importedRoutes?: ImportedRoute | null;
+}> = ({ nodes, selectedNodeId, selectNode, isArabic, trainingActive, convoyPatrolMode, defenseGridActive, importedRoutes }) => (
   <div className="absolute inset-0 overflow-hidden bg-[#211d16]">
     <svg viewBox="0 0 1000 620" preserveAspectRatio="xMidYMid slice" className="h-full w-full" role="img" aria-label={isArabic ? 'خريطة ساحة التدريب الافتراضية' : 'Virtual training arena map'}>
       <defs>
@@ -68,6 +90,8 @@ const TrainingMap: React.FC<{
       <g transform="translate(505 305)"><rect x="-45" y="-26" width="90" height="52" rx="8" fill="#1b1712" stroke="#e6cfa6" strokeWidth="2" /><path d="M-20 0 H20 M0 -14 V14" stroke="#e6cfa6" strokeWidth="3" /><text x="0" y="44" textAnchor="middle" fill="#f6ecdd" fontSize="13">قاعدة القيادة</text></g>
       {defenseGridActive && <g fill="none" stroke="#b5793f" strokeWidth="3" opacity=".7"><circle cx="505" cy="305" r="82" strokeDasharray="10 8" /><circle cx="505" cy="305" r="142" strokeDasharray="5 12" /></g>}
       {convoyPatrolMode && <g fill="none" stroke="#e0a653" strokeWidth="5" strokeDasharray="14 8" opacity=".85"><path d="M110 510 C250 450 310 455 420 350" /><path d="M870 500 C760 445 700 390 610 350" /><circle cx="210" cy="465" r="12" /><circle cx="790" cy="460" r="12" /></g>}
+      {importedRoutes && <g fill="none" stroke="#8fc46a" strokeWidth="5" strokeDasharray="12 7" opacity=".9"><polyline points={importedRoutes.points.map((point) => `${point.x},${point.y}`).join(' ')} /></g>}
+      {importedRoutes?.points.map((point, index) => <g key={`imported-${index}`} transform={`translate(${point.x} ${point.y})`}><circle r="8" fill="#e2c18f" stroke="#17130e" strokeWidth="3" /><text x="12" y="4" fill="#f6ecdd" fontSize="12">{point.label ?? `P-${index + 1}`}</text></g>)}
       {nodes.map((node, index) => {
         const point = trainingMapPoints[index % trainingMapPoints.length];
         const x = point.x * 10;
@@ -99,12 +123,20 @@ export const CommonOperationalPictureView: React.FC = () => {
     updateSettings,
     navigateToModule,
   } = useSimulation();
+  const { readTextAsset } = useAssets();
 
   const [viewPerspective, setViewPerspective] = useState<'3d' | 'topdown'>('topdown');
   const [trainingActive, setTrainingActive] = useState<boolean>(true);
   const [convoyPatrolMode, setConvoyPatrolMode] = useState<boolean>(true);
   const [defenseGridActive, setDefenseGridActive] = useState<boolean>(true);
   const [showTrainingMeasurements, setShowTrainingMeasurements] = useState<boolean>(true);
+  const [importedRoutes, setImportedRoutes] = useState<ImportedRoute | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void readTextAsset('routes').then((text) => { if (!cancelled) setImportedRoutes(text ? parseImportedRoutes(text) : null); });
+    return () => { cancelled = true; };
+  }, [readTextAsset]);
 
   // Live simulation event log ticker
   const [tacticalEvents, setTacticalEvents] = useState<Array<{ id: string; time: string; text: string; type: 'info' | 'alert' | 'success' }>>([
@@ -251,7 +283,7 @@ export const CommonOperationalPictureView: React.FC = () => {
               convoyPatrolMode={convoyPatrolMode}
               defenseGridActive={defenseGridActive}
             />
-          ) : <TrainingMap nodes={nodes} selectedNodeId={selectedNodeId} selectNode={selectNode} isArabic={isArabic} trainingActive={trainingActive} convoyPatrolMode={convoyPatrolMode} defenseGridActive={defenseGridActive} />}
+          ) : <TrainingMap nodes={nodes} selectedNodeId={selectedNodeId} selectNode={selectNode} isArabic={isArabic} trainingActive={trainingActive} convoyPatrolMode={convoyPatrolMode} defenseGridActive={defenseGridActive} importedRoutes={importedRoutes} />}
 
           {/* Synchronized Selected Target HUD Box */}
           {selectedNode && showTrainingMeasurements && (

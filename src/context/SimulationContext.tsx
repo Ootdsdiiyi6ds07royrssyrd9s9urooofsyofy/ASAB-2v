@@ -110,23 +110,40 @@ export const SimulationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     showCoverageLayer: true,
     showLabels: true,
     activeEnvironment: 'asab',
-    activeModuleId: 'command-center',
+    activeModuleId: 'overview',
   };
   const [settings, setSettings] = useState<SystemSettings>(() => {
     try {
       const saved = localStorage.getItem('asab_settings');
       if (saved) {
         // Merge with defaults so newly added fields never end up undefined; keep the user's saved language.
-        return { ...DEFAULT_SETTINGS, ...JSON.parse(saved) };
+        const parsed = { ...DEFAULT_SETTINGS, ...JSON.parse(saved) };
+        if (localStorage.getItem('asab_ui_version') !== '4') {
+          localStorage.setItem('asab_ui_version', '4');
+          return { ...parsed, activeModuleId: 'overview', activeEnvironment: 'asab' };
+        }
+        return parsed;
       }
     } catch (e) {
       // storage unavailable or corrupt: fall back to defaults
     }
+    try { localStorage.setItem('asab_ui_version', '4'); } catch (e) { /* ignore */ }
     return DEFAULT_SETTINGS;
   });
 
   // Save settings on update
   useEffect(() => {
+    try {
+      if (localStorage.getItem('asab_ui_version') !== '4') {
+        localStorage.setItem('asab_ui_version', '4');
+        if (settings.activeModuleId === 'command-center') {
+          setSettings((prev) => ({ ...prev, activeModuleId: 'overview', activeEnvironment: 'asab' }));
+          return;
+        }
+      }
+    } catch (e) {
+      // ignore storage versioning failures
+    }
     try {
       localStorage.setItem('asab_settings', JSON.stringify(settings));
     } catch (e) {

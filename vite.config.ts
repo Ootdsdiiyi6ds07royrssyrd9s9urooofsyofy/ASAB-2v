@@ -18,7 +18,6 @@ export default defineConfig(() => {
       allowedHosts: [
         '3000-ivhu4vsnd99meplnk7h27-b3ea4108.sg2.manus.computer',
         '3001-ivhu4vsnd99meplnk7h27-b3ea4108.sg2.manus.computer',
-        '3002-ivhu4vsnd99meplnk7h27-b3ea4108.sg2.manus.computer',
       ],
       // Disable file watching when DISABLE_HMR is true to save CPU during agent edits.
       watch: process.env.DISABLE_HMR === 'true' ? null : {},

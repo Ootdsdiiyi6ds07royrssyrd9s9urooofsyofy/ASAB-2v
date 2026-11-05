@@ -8,9 +8,11 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { buildAircraftModel, AircraftFinishScheme, AircraftMeshPart } from './AircraftModel3D';
 import { createTarmacTexture } from './proceduralTextures';
 import { useSimulation } from '../../context/SimulationContext';
+import { useAssets } from '../../context/AssetContext';
 import {
   Maximize2,
   Minimize2,
@@ -49,10 +51,13 @@ export const AircraftStudio3DCanvas: React.FC<AircraftStudioProps> = ({
   } = useSimulation();
 
   const isArabic = settings.language === 'ar';
+  const { urls } = useAssets();
+  const customAircraftUrl = urls.aircraft;
 
   const [hoveredComponentId, setHoveredComponentId] = useState<string | null>(null);
   const [activeFinish, setActiveFinish] = useState<AircraftFinishScheme>('stealth');
-  const [isControlsExpanded, setIsControlsExpanded] = useState<boolean>(true);
+  // Keep the finish/camera dock out of the way by default; the floating toggle remains visible.
+  const [isControlsExpanded, setIsControlsExpanded] = useState<boolean>(false);
   const [autoRotate, setAutoRotate] = useState<boolean>(false);
   const autoRotateRef = useRef(autoRotate);
   const selectedComponentRef = useRef(selectedComponentId);
@@ -76,6 +81,7 @@ export const AircraftStudio3DCanvas: React.FC<AircraftStudioProps> = ({
   const gridHelperRef = useRef<THREE.GridHelper | null>(null);
   const tarmacMeshRef = useRef<THREE.Mesh | null>(null);
   const measurementGroupRef = useRef<THREE.Group | null>(null);
+  const customAircraftRef = useRef<THREE.Group | null>(null);
 
   // Target camera positions for smooth damping transitions
   const targetCamPos = useRef<THREE.Vector3>(new THREE.Vector3(3.4, 2.2, 4.2));
@@ -87,31 +93,31 @@ export const AircraftStudio3DCanvas: React.FC<AircraftStudioProps> = ({
     if (!controlsRef.current) return;
     switch (cameraPreset) {
       case 'hero':
-        targetCamPos.current.set(4.5, 2.65, 5.4);
+        targetCamPos.current.set(6.8, 4.2, 7.8);
         targetLookAt.current.set(0, 0.65, 0);
         break;
       case 'front':
-        targetCamPos.current.set(0, 0.65, 5.2);
+        targetCamPos.current.set(0, 1.25, 7.4);
         targetLookAt.current.set(0, 0.62, 0);
         break;
       case 'side':
-        targetCamPos.current.set(-5.6, 0.65, 0);
+        targetCamPos.current.set(-8.2, 1.25, 0);
         targetLookAt.current.set(0, 0.62, 0);
         break;
       case 'rear':
-        targetCamPos.current.set(0, 1.05, -5.5);
+        targetCamPos.current.set(0, 2.0, -7.8);
         targetLookAt.current.set(0, 0.68, -0.55);
         break;
       case 'top':
-        targetCamPos.current.set(0, 6.2, 0.01);
+        targetCamPos.current.set(0, 8.8, 0.01);
         targetLookAt.current.set(0, 0.62, 0);
         break;
       case 'bottom':
-        targetCamPos.current.set(0, -4.8, 0.01);
+        targetCamPos.current.set(0, -7.4, 0.01);
         targetLookAt.current.set(0, 0.62, 0);
         break;
       case 'detail':
-        targetCamPos.current.set(2.25, 1.25, 2.65);
+        targetCamPos.current.set(3.8, 2.2, 4.4);
         targetLookAt.current.set(0, 0.65, 0.75);
         break;
       case 'iso':
@@ -120,7 +126,7 @@ export const AircraftStudio3DCanvas: React.FC<AircraftStudioProps> = ({
         break;
       case 'reset':
       default:
-        targetCamPos.current.set(3.4, 2.0, 4.2);
+        targetCamPos.current.set(6.0, 3.6, 7.0);
         targetLookAt.current.set(0, 0.62, 0);
         break;
     }
@@ -509,6 +515,41 @@ export const AircraftStudio3DCanvas: React.FC<AircraftStudioProps> = ({
       aircraftDataRef.current.setScheme(activeFinish);
     }
   }, [activeFinish]);
+
+  // A user-supplied GLB/GLTF replaces the procedural aircraft without losing the default fallback.
+  useEffect(() => {
+    const scene = sceneRef.current;
+    const fallback = aircraftDataRef.current?.rootGroup;
+    if (!scene || !fallback) return;
+    if (customAircraftRef.current) {
+      scene.remove(customAircraftRef.current);
+      customAircraftRef.current.traverse((child) => {
+        if (child instanceof THREE.Mesh) {
+          child.geometry.dispose();
+          const materials = Array.isArray(child.material) ? child.material : [child.material];
+          materials.forEach((material) => material.dispose());
+        }
+      });
+      customAircraftRef.current = null;
+    }
+    fallback.visible = !customAircraftUrl;
+    if (!customAircraftUrl) return;
+    const loader = new GLTFLoader();
+    loader.load(customAircraftUrl, (gltf) => {
+      const model = gltf.scene;
+      model.name = 'user-aircraft-model';
+      model.position.set(0, 0.35, 0);
+      model.scale.setScalar(1);
+      model.traverse((child) => {
+        if (child instanceof THREE.Mesh) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+        }
+      });
+      customAircraftRef.current = model;
+      scene.add(model);
+    });
+  }, [customAircraftUrl]);
 
   // Dynamic prop updates
   useEffect(() => {

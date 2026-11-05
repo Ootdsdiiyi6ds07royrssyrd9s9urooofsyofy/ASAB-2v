@@ -32,9 +32,24 @@ export const AircraftStudioView: React.FC = () => {
   const [isInspectorOpen, setIsInspectorOpen] = useState<boolean>(true);
 
   const isArabic = settings.language === 'ar';
-  const selectedComponent = components.find((c) => c.id === selectedComponentId);
+  const supportedIds = new Set([
+    'comp_fuselage_main', 'comp_nose_radome', 'comp_wing_left', 'comp_wing_right', 'comp_wingtip_left', 'comp_wingtip_right',
+    'comp_stabilizer_vert', 'comp_avionics_bay', 'comp_battery_pack', 'comp_sensor_gimbal', 'comp_landing_gear',
+  ]);
+  const conceptComponents = [
+    {
+      id: 'comp_central_lift_fan', name: 'Central Lift Fan & Shroud', nameAr: 'مروحة الرفع المركزية وحلقة الحماية', category: 'Propulsion' as const,
+      description: 'Large shrouded vertical-lift fan integrated behind the cockpit in the blended center fuselage.', functionDesc: 'Provides the primary vertical thrust for hover and short takeoff while remaining flush with the upper airframe in cruise.', location: 'Center Fuselage Upper Bay', massKg: 12.4, powerDrawWatts: 4200, status: 'Operational' as const, meshOffset: [0, 1.2, .2] as [number, number, number], associatedComponents: ['comp_fuselage_main', 'comp_avionics_bay'], specs: { FanDiameter: '1.50 m', BladeCount: 10, LiftMode: 'Shrouded vertical lift' },
+    },
+    {
+      id: 'comp_mission_bays', name: 'Conformal Mission & Sensor Bays', nameAr: 'حجرات المهام والمستشعرات المدمجة', category: 'Payload & Sensors' as const,
+      description: 'Flush lower-wing fairings for modular mission equipment and protected sensor packages.', functionDesc: 'Carries configurable mission modules without disrupting the blended delta-wing planform.', location: 'Lower Wing Roots', massKg: 6.8, powerDrawWatts: 180, status: 'Operational' as const, meshOffset: [0, -.65, -.65] as [number, number, number], associatedComponents: ['comp_wing_left', 'comp_wing_right'], specs: { Configuration: 'Conformal modular bays', Clearance: 'Protected internal carriage' },
+    },
+  ];
+  const studioComponents = [...components.filter((component) => supportedIds.has(component.id)), ...conceptComponents];
+  const selectedComponent = studioComponents.find((c) => c.id === selectedComponentId);
 
-  const filteredComponents = components.filter((c) => {
+  const filteredComponents = studioComponents.filter((c) => {
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
     return c.name.toLowerCase().includes(q) || c.category.toLowerCase().includes(q) || c.id.toLowerCase().includes(q);
@@ -54,7 +69,7 @@ export const AircraftStudioView: React.FC = () => {
               </div>
               <div className="flex items-center gap-1">
                 <span className="text-[10px] text-[#9a6a3a] px-1.5 py-0.5 rounded bg-[#231a12]">
-                  {components.length}
+                  {studioComponents.length}
                 </span>
                 <button
                   onClick={() => setIsTreeOpen(false)}

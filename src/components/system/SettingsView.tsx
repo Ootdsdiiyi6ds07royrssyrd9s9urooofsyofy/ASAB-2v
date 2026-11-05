@@ -1,12 +1,27 @@
 import React from 'react';
-import { Gauge, Globe, Layers, RotateCcw, Settings as SettingsIcon, Sliders, Volume2 } from 'lucide-react';
+import { Gauge, Globe, Layers, RotateCcw, Settings as SettingsIcon, Sliders, Volume2, Upload, Trash2, HardDrive } from 'lucide-react';
 import { useSimulation } from '../../context/SimulationContext';
+import { useAssets } from '../../context/AssetContext';
+import type { AssetKind } from '../../types/assets';
 
 export const SettingsView: React.FC = () => {
   const { settings, updateSettings, resetSimulation } = useSimulation();
+  const { assets, ready, saveAsset, removeAsset } = useAssets();
   const isArabic = settings.language === 'ar';
   const qualityNames = isArabic ? { low: 'اقتصادي', medium: 'متوازن', high: 'فائق' } : { low: 'Low', medium: 'Medium', high: 'High' };
   const speedNames = isArabic ? { 0.5: 'نصف السرعة', 1: 'طبيعي', 2: 'ضعف السرعة', 4: 'أربع مرات' } : { 0.5: '0.5x Realtime', 1: '1x Realtime', 2: '2x Realtime', 4: '4x Realtime' };
+  const assetLabels: Record<AssetKind, [string, string, string]> = {
+    aircraft: ['نموذج الطائرة 3D', 'Aircraft 3D model', '.glb,.gltf,.bin'],
+    map3d: ['خريطة المحاكاة 3D', 'Simulation 3D map', '.glb,.gltf,.bin'],
+    routes: ['المسارات والنقاط', 'Routes and points', '.geojson,.json,.csv'],
+    mass: ['الوزنية والكتلة', 'Mass properties', '.json,.csv'],
+    mechanics: ['الميكانيكل والمعادلات', 'Mechanics and equations', '.json,.csv,.txt,.ts'],
+  };
+  const handleAsset = async (kind: AssetKind, event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) await saveAsset(kind, file);
+    event.target.value = '';
+  };
 
   return (
     <div className="h-full max-w-4xl space-y-4 overflow-y-auto bg-[#120e0a] p-3 text-xs text-[#f6ecdd] sm:space-y-6 sm:p-6" dir={isArabic ? 'rtl' : 'ltr'}>
@@ -49,6 +64,22 @@ export const SettingsView: React.FC = () => {
           <label className="flex cursor-pointer items-center gap-3"><input type="checkbox" checked={settings.showCoverageLayer} onChange={(event) => updateSettings({ showCoverageLayer: event.target.checked })} className="accent-[#9a6a3a]" /><span>{isArabic ? 'إظهار مناطق تغطية العقد' : 'Show node coverage areas'}</span></label>
           <label className="flex cursor-pointer items-center gap-3"><input type="checkbox" checked={settings.showLabels} onChange={(event) => updateSettings({ showLabels: event.target.checked })} className="accent-[#9a6a3a]" /><span>{isArabic ? 'إظهار رموز نداء الطائرات' : 'Show aircraft callsigns'}</span></label>
         </div>
+      </section>
+
+      <section className="space-y-4 rounded-2xl border border-[#9a6a3a]/40 bg-[#1a140e] p-5">
+        <div className="flex items-center gap-2 text-sm font-bold"><HardDrive className="h-4 w-4 text-[#e2c18f]" />{isArabic ? 'مكتبة الأصول الدائمة' : 'Persistent asset library'}</div>
+        <p className="font-sans text-[11px] leading-6 text-[#b9a58c]">{isArabic ? 'ترفع الملفات مرة واحدة وتبقى محفوظة على هذا الجهاز حتى تستبدلها أو تحذفها يدويًا.' : 'Files are retained on this device until you replace or explicitly remove them.'}</p>
+        <div className="grid gap-3 md:grid-cols-2">
+          {(Object.keys(assetLabels) as AssetKind[]).map((kind) => {
+            const [ar, en, accept] = assetLabels[kind];
+            const saved = assets[kind];
+            return <div key={kind} className="rounded-xl border border-[#32261b] bg-[#231a12] p-3">
+              <div className="flex items-start justify-between gap-2"><div><div className="font-bold text-[#f6ecdd]">{isArabic ? ar : en}</div><div className="mt-1 truncate text-[10px] text-[#8c7860]">{saved ? saved.fileName : (isArabic ? 'لم يتم رفع ملف' : 'No file uploaded')}</div></div>{saved && <button type="button" onClick={() => void removeAsset(kind)} className="rounded-lg p-1.5 text-[#e8584a] hover:bg-[#e8584a]/10" title={isArabic ? 'حذف الملف' : 'Remove file'}><Trash2 className="h-3.5 w-3.5" /></button>}</div>
+              <label className="mt-3 flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-[#9a6a3a]/50 px-3 py-2 text-[11px] font-bold text-[#e2c18f] hover:bg-[#32261b]"><Upload className="h-3.5 w-3.5" />{isArabic ? 'رفع / استبدال' : 'Upload / replace'}<input type="file" accept={accept} className="hidden" onChange={(event) => void handleAsset(kind, event)} /></label>
+            </div>;
+          })}
+        </div>
+        <div className="text-[10px] text-[#8c7860]">{ready ? (isArabic ? 'التخزين الدائم جاهز · IndexedDB' : 'Persistent storage ready · IndexedDB') : (isArabic ? 'جارٍ تجهيز التخزين...' : 'Preparing storage...')}</div>
       </section>
 
       <section className="space-y-4 rounded-2xl border border-[#e8584a]/30 bg-[#1a140e] p-5">

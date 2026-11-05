@@ -6,7 +6,9 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { useSimulation } from '../../context/SimulationContext';
+import { useAssets } from '../../context/AssetContext';
 
 export interface Airspace3DProps {
   viewMode?: '3d' | 'topdown';
@@ -57,6 +59,8 @@ export const Airspace3DCanvas: React.FC<Airspace3DProps> = ({ viewMode = '3d', t
     selectNode,
     settings,
   } = useSimulation();
+  const { urls } = useAssets();
+  const customMapUrl = urls.map3d;
 
   // Internal references to sync dynamic simulation state without remounting canvas
   const sceneRef = useRef<THREE.Scene | null>(null);
@@ -76,6 +80,7 @@ export const Airspace3DCanvas: React.FC<Airspace3DProps> = ({ viewMode = '3d', t
   const sweepRef = useRef<THREE.Object3D | null>(null);
   const patrolRef = useRef<THREE.Object3D | null>(null);
   const defenseRef = useRef<THREE.Object3D | null>(null);
+  const customMapRef = useRef<THREE.Group | null>(null);
   qualityRef.current = settings.quality;
   trainingActiveRef.current = trainingActive;
   convoyPatrolRef.current = convoyPatrolMode;
@@ -85,6 +90,34 @@ export const Airspace3DCanvas: React.FC<Airspace3DProps> = ({ viewMode = '3d', t
   useEffect(() => {
     selectedNodeRef.current = selectedNodeId;
   }, [selectedNodeId]);
+
+  useEffect(() => {
+    const scene = sceneRef.current;
+    if (!scene || !customMapUrl) return;
+    if (customMapRef.current) {
+      scene.remove(customMapRef.current);
+      disposeTree(customMapRef.current);
+      customMapRef.current = null;
+    }
+    const loader = new GLTFLoader();
+    loader.load(customMapUrl, (gltf) => {
+      const map = gltf.scene;
+      const bounds = new THREE.Box3().setFromObject(map);
+      const size = bounds.getSize(new THREE.Vector3());
+      const largest = Math.max(size.x, size.y, size.z, 1);
+      const scale = 160 / largest;
+      map.scale.setScalar(scale);
+      const scaledBounds = new THREE.Box3().setFromObject(map);
+      const center = scaledBounds.getCenter(new THREE.Vector3());
+      map.position.sub(center);
+      map.position.y -= scaledBounds.min.y;
+      map.traverse((child) => {
+        if (child instanceof THREE.Mesh) { child.castShadow = true; child.receiveShadow = true; }
+      });
+      customMapRef.current = map;
+      scene.add(map);
+    });
+  }, [customMapUrl]);
 
   // Adjust camera based on viewMode
   useEffect(() => {
